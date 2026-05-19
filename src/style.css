@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --couleur-fond: #050505;
+  --couleur-texte: #ffffff;
+  --couleur-bleu: #0082c8;
+  --couleur-bleu-survol: #009cf0;
+  --couleur-gris-principal: rgba(255, 255, 255, 0.97);
+  --couleur-gris-secondaire: rgba(255, 255, 255, 0.6);
+  --couleur-gris-sombre: rgba(255, 255, 255, 0.3);
+  --couleur-bordure: rgba(255, 255, 255, 0.1);
+  
+  --police-titre: 'Space Grotesk', sans-serif;
+  --police-texte: 'Space Grotesk', sans-serif;
+  --police-code: 'Space Grotesk', sans-serif;
+  
+  --transition-douce: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --transition-rapide: all 0.2s ease;
+}
+
+/* Réinitialisation globale */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+html, body {
+  background-color: var(--couleur-fond);
+  color: var(--couleur-texte);
+  font-family: var(--police-texte);
+  overflow-x: hidden;
+  min-height: 100vh;
+  width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-rapide);
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Barre de défilement stylisée et invisible/subtile */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--couleur-fond);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Classes utilitaires */
+.texte-titre {
+  font-family: var(--police-titre);
+}
+
+.texte-majuscule {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* Conteneur global */
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
