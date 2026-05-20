@@ -14,7 +14,6 @@
           </div>
           <div class="stat-label texte-majuscule">{{ stat.label }}</div>
         </div>
-        <!-- Barre de séparation verticale à droite de chaque élément sauf le dernier -->
         <div 
           class="stat-separateur" 
           v-if="index < statistiques.length - 1"
@@ -114,22 +113,24 @@ onMounted(() => {
 }
 
 .stats-grille {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 60%;
+    margin: 0 auto;
+    margin-bottom: 4vh;
+    width: 100%;
 }
 
 .stat-element {
   display: flex;
   align-items: center;
   flex: 1;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .stat-bloc-texte {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -137,7 +138,7 @@ onMounted(() => {
 }
 
 .stat-valeur {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 500;
   color: var(--couleur-texte);
   display: flex;
@@ -150,28 +151,25 @@ onMounted(() => {
 }
 
 .prefixe, .suffixe {
-  color: var(--couleur-texte); /* En blanc uni comme sur le mockup */
+  color: var(--couleur-texte); 
   font-weight: 500;
 }
 
 .stat-label {
   font-size: 0.62rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.15em;
-  color: rgba(255, 255, 255, 0.4); /* Gris moyen discret */
+  color: rgb(255, 255, 255);
   text-transform: uppercase;
 }
 
 .stat-separateur {
   width: 1px;
-  height: 50px;
-  background-color: rgba(255, 255, 255, 0.15); /* Ligne verticale fine blanche discrète */
-  margin-left: auto;
-  margin-right: 0;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.4);
   display: block;
 }
 
-/* Version responsive pour tablettes et mobiles */
 @media (max-width: 900px) {
   .stats-grille {
     flex-direction: column;
@@ -183,7 +181,7 @@ onMounted(() => {
   }
   
   .stat-separateur {
-    display: none; /* Masquer la ligne sur mobile */
+    display: none;
   }
   
   .stat-valeur {

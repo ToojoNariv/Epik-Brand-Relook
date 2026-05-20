@@ -3,7 +3,7 @@
 :root {
   --couleur-fond: #050505;
   --couleur-texte: #ffffff;
-  --couleur-bleu: #0082c8;
+  --couleur-bleu: linear-gradient(to right, #0096E7, #0072B1);
   --couleur-bleu-survol: #009cf0;
   --couleur-gris-principal: rgba(255, 255, 255, 0.97);
   --couleur-gris-secondaire: rgba(255, 255, 255, 0.6);

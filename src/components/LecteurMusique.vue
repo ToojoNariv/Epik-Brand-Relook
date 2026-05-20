@@ -5,7 +5,15 @@
     :class="{ 'actif': estEnLecture }"
     aria-label="Contrôle de la musique d'ambiance"
   >
-    Musique — {{ estEnLecture ? 'On' : 'Off' }}
+    <span class="prefixe-musique">Musique — </span>
+    <span class="masque-texte" :key="estEnLecture">
+      <span 
+        v-for="(lettre, i) in (estEnLecture ? 'On' : 'Off').split('')" 
+        :key="i"
+        class="lettre-musique"
+        :style="{ animationDelay: `${i * 0.03}s` }"
+      >{{ lettre }}</span>
+    </span>
   </button>
 </template>
 
@@ -154,5 +162,33 @@ onBeforeUnmount(() => {
 
 .bouton-musique.actif {
   opacity: 1;
+}
+
+.prefixe-musique {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.masque-texte {
+  display: inline-block;
+  overflow: hidden;
+  line-height: 1.2;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.lettre-musique {
+  display: inline-block;
+  transform: translateY(115%);
+  animation: monterAscenseurMusique 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes monterAscenseurMusique {
+  from {
+    transform: translateY(115%);
+  }
+  to {
+    transform: translateY(0%);
+  }
 }
 </style>
