@@ -12,7 +12,7 @@
             <span class="nombre">{{ stat.valeurAffichee }}</span>
             <span class="suffixe" v-if="stat.suffixe">{{ stat.suffixe }}</span>
           </div>
-          <div class="stat-label texte-majuscule">{{ stat.label }}</div>
+          <div class="stat-label texte-majuscule">{{ t(stat.cleTranslation) }}</div>
         </div>
         <div 
           class="stat-separateur" 
@@ -27,6 +27,7 @@
 import { ref, onMounted } from 'vue';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { t } from '../i18n/index';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -36,28 +37,28 @@ const statistiques = ref([
     valeurCible: 150, 
     prefixe: "+", 
     suffixe: "", 
-    label: "Identités créées", 
+    cleTranslation: "stats.identites", 
     valeurAffichee: 0 
   },
   { 
     valeurCible: null, 
     prefixe: "", 
     suffixe: "", 
-    label: "Production audio", 
+    cleTranslation: "stats.audio", 
     valeurAffichee: "24/7" 
   },
   { 
     valeurCible: 98, 
     prefixe: "", 
     suffixe: "%", 
-    label: "Clients satisfaits", 
+    cleTranslation: "stats.satisfaits", 
     valeurAffichee: 0 
   },
   { 
     valeurCible: 12, 
     prefixe: "", 
     suffixe: "", 
-    label: "Pays atteints", 
+    cleTranslation: "stats.pays", 
     valeurAffichee: 0 
   }
 ]);
@@ -170,7 +171,7 @@ onMounted(() => {
   display: block;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .stats-grille {
     flex-direction: column;
     gap: 3.5rem;

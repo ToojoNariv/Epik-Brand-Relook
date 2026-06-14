@@ -11,7 +11,7 @@
             <img src="/images/Photographie Background.jpg" alt="Photographie Epik Brand" class="image-fond" />
             <div class="image-overlay">
               <h3 class="nom-expertise texte-titre">
-                <span class="lettre-titre-carte" v-for="(lettre, i) in 'Photographie'" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
+                <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.photo').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
               </h3>
             </div>
           </div>
@@ -22,11 +22,11 @@
       <div class="expertise-carte" id="carte-graphique" @click="$emit('selectionner', 'graphique')">
         <div class="expertise-conteneur-image">
           <div class="image-wrapper">
-            <img src="/images/jeff-sheldon-9SyOKYrq-rE-unsplash.jpg" alt="Graphique design Epik Brand"
+            <img src="https://ik.imagekit.io/h5zy3jui5/Home%20photo/design.jpg" alt="Graphique design Epik Brand"
               class="image-fond" />
             <div class="image-overlay">
               <h3 class="nom-expertise texte-titre">
-                <span class="lettre-titre-carte" v-for="(lettre, i) in 'Graphique design'" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
+                <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.graphique').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
               </h3>
             </div>
           </div>
@@ -48,7 +48,7 @@
             ></video>
             <div class="image-overlay">
               <h3 class="nom-expertise texte-titre">
-                <span class="lettre-titre-carte" v-for="(lettre, i) in 'Montage vidéo'" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
+                <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.video').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
               </h3>
             </div>
           </div>
@@ -62,7 +62,7 @@
             <img src="/images/Web Background.jpg" alt="Web Epik Brand" class="image-fond" />
             <div class="image-overlay">
               <h3 class="nom-expertise texte-titre">
-                <span class="lettre-titre-carte" v-for="(lettre, i) in 'Développement web'" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
+                <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.web').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
               </h3>
             </div>
           </div>
@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-// Géré de façon dynamique et synchronisé via PageAccueil.vue
+import { t } from '../i18n/index';
 </script>
 
 <style scoped>
@@ -116,6 +116,7 @@
   /* Fix Safari/Webkit overflow bug with transformed children */
   transform: translateZ(0);
   -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
   isolation: isolate;
 }
 
@@ -127,6 +128,7 @@
   overflow: hidden;
   transform: translateZ(0);
   -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
 }
 
 .image-wrapper {
@@ -186,7 +188,7 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .expertises-grille {
     grid-template-columns: 1fr;
     gap: 1.5rem;

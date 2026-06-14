@@ -1,132 +1,58 @@
 <template>
   <div ref="elementConteneur" class="accueil-conteneur">
-    <header class="entete-principale">
-      <div class="logo-conteneur">
-        <img src="/logo.svg" alt="Epik Brand Logo" class="logo-image" />
-      </div>
-
-      <div class="navigation-milieu">
-        <nav class="liens-navigation" ref="elementLiensNav">
-          <a href="#expertises" class="lien-nav actif">Nos expertises</a>
-          <a href="#menu" class="lien-nav">Menu</a>
-        </nav>
-
-        <div class="conteneur-bouton-offres" ref="elementBoutonOffres">
-          <a href="#offres" class="bouton-offres">
-            <span class="plus-gauche">+</span>
-            Voir nos offres
-            <span class="plus-droit">+</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="controle-musique">
-        <LecteurMusique />
-      </div>
-    </header>
+    <HeaderEpik ref="headerRef" mode="accueil" position="fixed" @logo-click="retournerAHero"
+      @expertises-click="gererClicExpertises" @menu-click="menuOuvert = !menuOuvert" @offres-click="ouvrirOffres" />
 
     <section class="section-hero" ref="elementSectionHero">
       <!-- 1. Image/Vidéo Héro autonome qui va "morpher" en carte Photographie -->
-      <div class="hero-image-morph" ref="elementImageMorph">
-        <video 
-          v-if="activeExpertise === 'video'" 
-          src="/images/Background vidéo.mp4" 
-          autoplay 
-          loop 
-          muted 
-          playsinline 
-          class="image-morphee-source"
-          style="width: 100%; height: 100%; object-fit: cover;"
-        ></video>
-        <img 
-          v-else 
-          :src="imagesExpertises[activeExpertise]" 
-          alt="Studio Photo Epik" 
-          class="image-morphee-source" 
-        />
+      <div class="hero-image-morph" ref="elementImageMorph" @click="ouvrirProjetsDepuisHero"
+        :style="{ pointerEvents: (etatAnimation === 1 && pageCourante === 'accueil') ? 'auto' : 'none', cursor: (etatAnimation === 1 && pageCourante === 'accueil') ? 'pointer' : 'default' }">
+        <video v-if="activeExpertise === 'video'" src="/images/Background vidéo.mp4" autoplay loop muted playsinline
+          class="image-morphee-source" style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <img v-else :src="imagesExpertises[activeExpertise]" alt="Studio Photo Epik" class="image-morphee-source" />
         <div class="overlay-morph" ref="elementOverlayMorph"></div>
         <div class="overlay-morph-discret" ref="elementOverlayMorphDiscret"></div>
       </div>
 
       <!-- Couches de morphing pour les 3 autres expertises (Surgissent depuis les miniatures) -->
       <div class="miniature-morph-layer" ref="elementMorphVideo">
-        <video 
-          v-if="expertiseMorphVideo === 'video'" 
-          src="/images/Background vidéo.mp4" 
-          autoplay 
-          loop 
-          muted 
-          playsinline 
-          class="image-morphee-source"
-          style="width: 100%; height: 100%; object-fit: cover;"
-        ></video>
-        <img 
-          v-else 
-          :src="imagesExpertises[expertiseMorphVideo]" 
-          alt="Vidéo Morph" 
-          class="image-morphee-source" 
-        />
+        <video v-if="expertiseMorphVideo === 'video'" src="/images/Background vidéo.mp4" autoplay loop muted playsinline
+          class="image-morphee-source" style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <img v-else :src="imagesExpertises[expertiseMorphVideo]" alt="Vidéo Morph" class="image-morphee-source" />
         <div class="overlay-morph-mini"></div>
       </div>
 
       <div class="miniature-morph-layer" ref="elementMorphGraphique">
-        <video 
-          v-if="expertiseMorphGraphique === 'video'" 
-          src="/images/Background vidéo.mp4" 
-          autoplay 
-          loop 
-          muted 
-          playsinline 
-          class="image-morphee-source"
-          style="width: 100%; height: 100%; object-fit: cover;"
-        ></video>
-        <img 
-          v-else 
-          :src="imagesExpertises[expertiseMorphGraphique]" 
-          alt="Graphique Morph" 
-          class="image-morphee-source" 
-        />
+        <video v-if="expertiseMorphGraphique === 'video'" src="/images/Background vidéo.mp4" autoplay loop muted
+          playsinline class="image-morphee-source" style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <img v-else :src="imagesExpertises[expertiseMorphGraphique]" alt="Graphique Morph"
+          class="image-morphee-source" />
         <div class="overlay-morph-mini"></div>
       </div>
 
       <div class="miniature-morph-layer" ref="elementMorphWeb">
-        <video 
-          v-if="expertiseMorphWeb === 'video'" 
-          src="/images/Background vidéo.mp4" 
-          autoplay 
-          loop 
-          muted 
-          playsinline 
-          class="image-morphee-source"
-          style="width: 100%; height: 100%; object-fit: cover;"
-        ></video>
-        <img 
-          v-else 
-          :src="imagesExpertises[expertiseMorphWeb]" 
-          alt="Web Morph" 
-          class="image-morphee-source" 
-        />
+        <video v-if="expertiseMorphWeb === 'video'" src="/images/Background vidéo.mp4" autoplay loop muted playsinline
+          class="image-morphee-source" style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <img v-else :src="imagesExpertises[expertiseMorphWeb]" alt="Web Morph" class="image-morphee-source" />
         <div class="overlay-morph-mini"></div>
       </div>
 
       <div class="slogan-centre" ref="elementSlogan">
         <div class="signe-plus-css" :key="'plus-gauche-' + activeExpertise"></div>
-        <h1 class="titre-principal text-titre" :key="activeExpertise" style="overflow: hidden; line-height: 1.2; padding-bottom: 0.05em; display: inline-block;">
-          <span 
-            v-for="(lettre, i) in titresExpertises[activeExpertise].split('')" 
-            :key="i"
-            class="lettre-titre-hero"
-            :style="{ animationDelay: `${i * 0.03}s` }"
-          >{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
+        <h1 class="titre-principal text-titre" :key="activeExpertise"
+          style="overflow: hidden; line-height: 1.2; padding-bottom: 0.05em; display: inline-block;">
+          <span v-for="(lettre, i) in t('hero.' + activeExpertise).split('')" :key="i" class="lettre-titre-hero"
+            :style="{ animationDelay: `${i * 0.03}s` }">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
         </h1>
         <div class="signe-plus-css" :key="'plus-droit-' + activeExpertise"></div>
       </div>
 
       <div class="menu-bas-gauche texte-majuscule" ref="elementMenuGauche">
-        <a href="#portfolio" class="lien-vertical">Portfolio</a>
-        <a href="#offres" class="lien-vertical">Nos offres</a>
-        <a href="#apropos" class="lien-vertical">A propos</a>
-        <a href="#contact" class="lien-vertical">Contact</a>
+        <a href="#portfolio" class="lien-vertical" @click.prevent="ouvrirPortfolio"
+          @mouseenter="playHoverMenu">{{ t('menu.portfolio') }}</a>
+        <a href="#offres" class="lien-vertical" @click.prevent="ouvrirOffres" @mouseenter="playHoverMenu">{{ t('menu.offres') }}</a>
+        <a href="#apropos" class="lien-vertical" @click.prevent="ouvrirAPropos" @mouseenter="playHoverMenu">{{ t('menu.apropos') }}</a>
+        <a href="#contact" class="lien-vertical" @click.prevent="ouvrirContact" @mouseenter="playHoverMenu">{{ t('menu.contact') }}</a>
       </div>
 
       <div class="pagination-bas" ref="elementPagination">
@@ -137,21 +63,9 @@
 
       <div class="miniatures-bas" ref="elementMiniatures">
         <template v-for="mini in miniaturesFiltrees" :key="mini.id">
-          <div 
-            class="miniature-cadre" 
-            :id="'mini-' + mini.id" 
-            @click="onMiniatureClic(mini.id)"
-          >
-            <video 
-              v-if="mini.id === 'video'" 
-              src="/images/Background vidéo.mp4" 
-              autoplay 
-              loop 
-              muted 
-              playsinline 
-              class="miniature-img"
-              style="width: 100%; height: 100%; object-fit: cover;"
-            ></video>
+          <div class="miniature-cadre" :id="'mini-' + mini.id" @click="onMiniatureClic(mini.id)">
+            <video v-if="mini.id === 'video'" src="/images/Background vidéo.mp4" autoplay loop muted playsinline
+              class="miniature-img" style="width: 100%; height: 100%; object-fit: cover;"></video>
             <img v-else :src="mini.src" :alt="mini.alt" class="miniature-img" />
             <!-- Overlay de survol avec texte dynamique -->
             <div class="miniature-survol-overlay">
@@ -167,24 +81,85 @@
     </section>
 
     <SectionStats ref="elementSectionStats" />
+
+    <!-- Vue des projets par catégorie (avec transition fluide en fondu/échelle) -->
+    <Transition name="fondu-projets">
+      <ProjetsView v-if="pageCourante === 'projets'" :categorie="activeExpertise" @close="retournerAExpertises"
+        @open-detail="projetActifDetail = $event" />
+    </Transition>
+
+    <!-- Vue du portfolio complet avec robot 3D Spline (transition sans scale pour performance WebGL) -->
+    <Transition name="fondu-portfolio">
+      <Portfolio v-show="pageCourante === 'portfolio'" :visible="pageCourante === 'portfolio'"
+        :categorie="activeExpertise" @close="retournerAExpertises" @open-detail="projetActifDetail = $event" />
+    </Transition>
+
+    <!-- Vue détaillée du projet (overlay plein écran) -->
+    <Transition name="fondu-projets">
+      <ProjetDetail v-if="projetActifDetail" :projet="projetActifDetail" @close="projetActifDetail = null" />
+    </Transition>
+
+    <Teleport to="body">
+      <MenuOverlay :ouvert="menuOuvert" @close="menuOuvert = false" @open-apropos="ouvrirAPropos"
+        @open-offres="ouvrirOffres" @open-portfolio="ouvrirPortfolio" @open-contact="ouvrirContact" />
+    </Teleport>
+
+    <Teleport to="body">
+      <OffresPage :ouvert="offresOuvert" @close="offresOuvert = false" @open-menu="menuOuvert = true" />
+    </Teleport>
+
+    <Teleport to="body">
+      <AProposPage :ouvert="aproposOuvert" @close="aproposOuvert = false" @open-menu="menuOuvert = true" />
+    </Teleport>
+
+    <Teleport to="body">
+      <ContactPage :ouvert="contactOuvert" @close="contactOuvert = false" @open-menu="menuOuvert = true" />
+    </Teleport>
+
+    <!-- Curseur personnalisé fluide sur tout le site -->
+    <CurseurCustom :est-sur-accueil="pageCourante === 'accueil' && etatAnimation === 1" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Observer } from 'gsap/Observer';
-import LecteurMusique from './LecteurMusique.vue';
+import { playCursorWithTextClick, playScrollTick, playShowingCard, playHoverMenu, playHomeCardApparition } from '../services/audioService';
+import { t } from '../i18n/index';
+import HeaderEpik from './HeaderEpik.vue';
 import GrilleExpertises from './GrilleExpertises.vue';
 import SectionStats from './SectionStats.vue';
+import MenuOverlay from './MenuOverlay.vue';
+import OffresPage from './OffresPage.vue';
+import AProposPage from './AProposPage.vue';
+import ContactPage from './ContactPage.vue';
+import ProjetsView from './ProjetsView.vue';
+import Portfolio from './Portfolio.vue';
+import ProjetDetail from './ProjetDetail.vue';
+import CurseurCustom from './CurseurCustom.vue';
 
+const props = defineProps({
+  startEntrance: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const headerRef = ref(null);
+const menuOuvert = ref(false);
+const offresOuvert = ref(false);
+const aproposOuvert = ref(false);
+const contactOuvert = ref(false);
+const pageCourante = ref('accueil'); // 'accueil' | 'projets' | 'portfolio'
+const projetActifDetail = ref(null);
 const activeExpertise = ref('photo');
 const imagesExpertises = {
-  photo: '/images/Photographie Background.jpg',
-  video: '/images/windows-w79mIrYKcK4-unsplash.jpg',
-  graphique: '/images/jeff-sheldon-9SyOKYrq-rE-unsplash.jpg',
-  web: '/images/Web Background.jpg'
+  photo: 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Photographie%20Background.jpg?updatedAt=1781288609519',
+  video: 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Background%20vid%C3%A9o.mp4?updatedAt=1781274755649',
+  graphique: 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/design.jpg',
+  web: 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Web%20Background.jpg?updatedAt=1781274741057'
 };
 
 const titresExpertises = {
@@ -200,18 +175,43 @@ const indexActiveExpertise = computed(() => {
 });
 
 const obtenirMiniLabel = (id) => {
-  if (id === 'photo') return 'Photo';
-  if (id === 'video') return 'Video';
-  if (id === 'graphique') return 'Design';
-  if (id === 'web') return 'Web';
+  if (id === 'photo') return t('hero.labelPhoto');
+  if (id === 'video') return t('hero.labelVideo');
+  if (id === 'graphique') return t('hero.labelDesign');
+  if (id === 'web') return t('hero.labelWeb');
   return '';
 };
 
+const fermerToutesLesPages = () => {
+  offresOuvert.value = false;
+  aproposOuvert.value = false;
+  contactOuvert.value = false;
+  projetActifDetail.value = null;
+};
+
+const ouvrirOffres = () => {
+  menuOuvert.value = false;
+  fermerToutesLesPages();
+  offresOuvert.value = true;
+};
+
+const ouvrirAPropos = () => {
+  menuOuvert.value = false;
+  fermerToutesLesPages();
+  aproposOuvert.value = true;
+};
+
+const ouvrirContact = () => {
+  menuOuvert.value = false;
+  fermerToutesLesPages();
+  contactOuvert.value = true;
+};
+
 const toutesLesExpertises = [
-  { id: 'photo', src: '/images/Photographie Background.jpg', alt: 'Vignette Photo' },
-  { id: 'video', src: '/images/windows-w79mIrYKcK4-unsplash.jpg', alt: 'Vignette Vidéo' },
-  { id: 'graphique', src: '/images/jeff-sheldon-9SyOKYrq-rE-unsplash.jpg', alt: 'Vignette Graphique' },
-  { id: 'web', src: '/images/Web Background.jpg', alt: 'Vignette Web' }
+  { id: 'photo', src: 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Photographie%20Background.jpg?updatedAt=1781288609519', alt: 'Vignette Photo' },
+  { id: 'video', src: 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Background%20vid%C3%A9o.mp4?updatedAt=1781274755649', alt: 'Vignette Vidéo' },
+  { id: 'graphique', src: 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/design.jpg', alt: 'Vignette Graphique' },
+  { id: 'web', src: 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Web%20Background.jpg?updatedAt=1781274741057', alt: 'Vignette Web' }
 ];
 
 
@@ -247,6 +247,7 @@ const elementBoutonOffres = ref(null);
 const elementMenuGauche = ref(null);
 const elementPagination = ref(null);
 const elementMiniatures = ref(null);
+const elementTransitionCurtain = ref(null);
 
 // Couches de morphing des miniatures
 const elementMorphVideo = ref(null);
@@ -257,8 +258,9 @@ const elementSectionStats = ref(null);
 
 let contexteScrollTrigger = null;
 let timelinePrincipale = null;
-let etatAnimation = 1; // 1 = hero, 2 = grille et stats
+const etatAnimation = ref(1); // 1 = hero, 2 = grille et stats
 let animationEnCours = false;
+let mainScrollObserver = null;
 
 const initialiserAnimations = () => {
   if (contexteScrollTrigger) {
@@ -280,7 +282,7 @@ const initialiserAnimations = () => {
       elementMenuGauche.value,
       elementPagination.value
     ], { opacity: 1, y: 0, clearProps: "y" });
-    
+
     // L'animation du titre Héro est maintenant gérée purement en CSS (@keyframes) 
     // pour garantir son exécution parfaite à chaque changement de 'activeExpertise'
     gsapInstance.set(elementSlogan.value, { opacity: 1, y: 0, clearProps: "y" });
@@ -288,9 +290,9 @@ const initialiserAnimations = () => {
 
   // Cacher le container des titres de cartes, mais aussi masquer les lettres
   gsapInstance.set(".nom-expertise", { opacity: 1, y: 0 }); // Le conteneur reste visible
-  gsapInstance.set(".lettre-titre-carte", { y: "110%" }); // Masquées en bas du masque
+  gsapInstance.set(".lettre-titre-carte", { y: "110%", opacity: 1 }); // Masquées en bas du masque
   gsapInstance.set(".image-overlay", { opacity: 0 });
-  
+
   // L'overlay d'accueil démarre à 0 et fait une transition fluide (plus de popup brusque)
   gsapInstance.set(elementOverlayMorph.value, { opacity: 0 });
   gsapInstance.to(elementOverlayMorph.value, { opacity: 1, duration: 0.8, ease: "power2.out" });
@@ -322,19 +324,19 @@ const initialiserAnimations = () => {
   const act = activeExpertise.value;
 
   const confVideo = {
-    image: act === 'video' ? '/images/Photographie Background.jpg' : '/images/windows-w79mIrYKcK4-unsplash.jpg',
+    image: act === 'video' ? 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Photographie%20Background.jpg?updatedAt=1781278583752' : 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Background%20vid%C3%A9o.mp4?updatedAt=1781274755649',
     mini: act === 'video' ? '#mini-photo' : '#mini-video',
     card: act === 'video' ? '#carte-photo' : '#carte-video'
   };
 
   const confGraphique = {
-    image: act === 'graphique' ? '/images/Photographie Background.jpg' : '/images/jeff-sheldon-9SyOKYrq-rE-unsplash.jpg',
+    image: act === 'graphique' ? 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/design.jpg' : 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/design.jpg',
     mini: act === 'graphique' ? '#mini-photo' : '#mini-graphique',
     card: act === 'graphique' ? '#carte-photo' : '#carte-graphique'
   };
 
   const confWeb = {
-    image: act === 'web' ? '/images/Photographie Background.jpg' : '/images/Web Background.jpg',
+    image: act === 'web' ? 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Photographie%20Background.jpg?updatedAt=1781278583752' : 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Web%20Background.jpg?updatedAt=1781274741057',
     mini: act === 'web' ? '#mini-photo' : '#mini-web',
     card: act === 'web' ? '#carte-photo' : '#carte-web'
   };
@@ -449,16 +451,16 @@ const initialiserAnimations = () => {
       const largeurVisible = grilleEl.parentElement.clientWidth;
       positionXMax = Math.max(0, largeurGrille - largeurVisible);
 
-      // quickTo pour la grille : 8s de glisse majestueuse
+      // quickTo pour la grille : scroll fluide et continu (sans assistance)
       quickTranslateX = gsapInstance.quickTo(grilleEl, "x", {
-        duration: 6,
-        ease: "power4.out"
+        duration: 0.8,
+        ease: "power2.out"
       });
 
-      // quickTo pour les images : synchrone à 100% avec le même ease et la même durée
+      // quickTo pour les images : parallax fluide synchrone
       quickTranslateXImages = gsapInstance.quickTo(".expertises-grille .image-fond", "x", {
-        duration: 8,
-        ease: "power4.out"
+        duration: 1.0,
+        ease: "power2.out"
       });
 
       // Raccorder les quickTo à la positionX initiale immédiatement
@@ -466,60 +468,40 @@ const initialiserAnimations = () => {
       quickTranslateXImages(positionX * 0.15);
     };
 
-    const scrollerGrille = (direction) => {
+    let dernierePositionTick = positionX;
+    const scrollerGrilleLibre = (delta) => {
       const grille = document.querySelector('.expertises-grille');
-      const cartes = document.querySelectorAll('.expertise-carte');
-      if (!grille || cartes.length === 0) return;
+      if (!grille) return;
 
       if (!quickTranslateX || !quickTranslateXImages) {
         initialiserScrollHorizontal();
       }
 
-      // Regroupement des événements du même geste de scroll (Debounce)
-      if (isScrolling) {
-        clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => {
-          isScrolling = false;
-        }, 150);
-        return;
-      }
+      positionX += delta;
+      positionX = Math.max(0, Math.min(positionX, positionXMax));
 
-      isScrolling = true;
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        isScrolling = false;
-      }, 150);
-
-      const cardWidth = cartes[0].getBoundingClientRect().width;
-      const gap = parseFloat(window.getComputedStyle(grille).gap) || 0;
-      const step = cardWidth + gap;
-
-      if (direction === 'droite') {
-        if (positionX < positionXMax) {
-          positionX = Math.min(positionX + step, positionXMax);
-        }
-      } else if (direction === 'gauche') {
-        positionX = Math.max(positionX - step, 0);
-      }
-
-      // Déplacer la grille vers la gauche
       quickTranslateX(-positionX);
-      // Déplacer les images légèrement vers la droite (opposé) de 15% pour l'effet de profondeur parallax
       quickTranslateXImages(positionX * 0.15);
+
+      if (Math.abs(positionX - dernierePositionTick) >= 40) {
+        dernierePositionTick = positionX;
+        playScrollTick();
+      }
     };
 
-    // Timeline principale jouée manuellement via Observer
     timelinePrincipale = gsapInstance.timeline({
       paused: true,
-      onStart: () => { animationEnCours = true; },
+      onStart: () => {
+        animationEnCours = true;
+      },
       onComplete: () => {
         animationEnCours = false;
-        etatAnimation = 2;
+        etatAnimation.value = 2;
         initialiserScrollHorizontal();
       },
       onReverseComplete: () => {
         animationEnCours = false;
-        etatAnimation = 1;
+        etatAnimation.value = 1;
         positionX = 0;
         isScrolling = false;
         if (scrollTimer) clearTimeout(scrollTimer);
@@ -531,6 +513,9 @@ const initialiserAnimations = () => {
           gsapInstance.set(grille, { x: 0 });
         }
         gsapInstance.set(".expertises-grille .image-fond", { x: 0 });
+        // Réinitialiser les propriétés transform des cartes (décalages éventuels de tlRetour)
+        gsapInstance.set('.expertise-carte', { clearProps: 'y,scale,transform,opacity' });
+        gsapInstance.set('.expertise-carte .image-overlay', { clearProps: 'opacity' });
       }
     });
 
@@ -561,6 +546,9 @@ const initialiserAnimations = () => {
       ease: "power2.inOut"
     }, 0);
 
+    // Jouer le son d'exploration après le début de l'estompage
+    timelinePrincipale.call(playCursorWithTextClick, null, 0.45);
+
     // À la fin de l'estompage des liens (t=1.4), on libère l'espace en les masquant physiquement (display: none)
     timelinePrincipale.set(elementLiensNav.value, { display: 'none' }, 1.4);
 
@@ -589,8 +577,8 @@ const initialiserAnimations = () => {
       const rectWeb = elementCibleWeb.getBoundingClientRect();
       const largeurFenetre = window.innerWidth;
 
-      // Si mobile, simple transition en opacité
-      if (largeurFenetre <= 960) {
+      // Si mobile/tablette, simple transition en opacité
+      if (largeurFenetre <= 1024) {
         gsapInstance.to(elementImageMorph.value, {
           opacity: 0.2,
           borderRadius: 0,
@@ -645,10 +633,14 @@ const initialiserAnimations = () => {
         duration: 1.1
       }, 0.1);
 
-      // Masquer les miniatures physiques dès le début du morphing
-      timelinePrincipale.to(elementMiniatures.value, {
+      // Masquer les miniatures physiques avec l'animation inverse (contraction vers la gauche)
+      timelinePrincipale.to(".miniature-cadre", {
+        scaleX: 0.8,
         opacity: 0,
-        duration: 1.15
+        transformOrigin: "left center",
+        duration: 0.6,
+        stagger: 0.05,
+        ease: "power2.in"
       }, 0.1);
 
       // 2. Les miniatures s'agrandissent et glissent vers leur position finale !
@@ -689,8 +681,10 @@ const initialiserAnimations = () => {
       // Les morph layers s'estompent au même moment (crossfade parfait entre t=1.65 et t=1.95)
       timelinePrincipale.to(".expertise-carte", {
         background: "#000000",
-        duration: 0.05
+        duration: 0.01
       }, 1.65);
+
+      timelinePrincipale.call(playHomeCardApparition, null, 1.3);
 
       timelinePrincipale.to(".expertise-carte .image-fond", {
         opacity: 1,
@@ -758,31 +752,47 @@ const initialiserAnimations = () => {
       }
     }, null, 1.0);
 
-    // Initialisation du contrôleur de scroll "un coup"
-    // GSAP Observer : onDown = scroll vers le BAS (deltaY > 0 sur Windows / Trackpad)
-    //                 onUp   = scroll vers le HAUT
-    Observer.create({
+    // Initialisation du contrôleur de scroll et de drag/swipe
+    if (mainScrollObserver) {
+      mainScrollObserver.kill();
+      mainScrollObserver = null;
+    }
+    mainScrollObserver = Observer.create({
       target: window,
       type: "wheel,touch,pointer",
-      onDown: () => {
-        if (animationEnCours) return;
+      onChange: (self) => {
+        if (animationEnCours || menuOuvert.value || pageCourante.value !== 'accueil') return;
 
-        if (etatAnimation === 1) {
-          timelinePrincipale.play();
-        } else if (etatAnimation === 2) {
-          scrollerGrille('droite');
-        }
-      },
-      onUp: () => {
-        if (animationEnCours) return;
+        if (etatAnimation.value === 1) {
+          // Si action vers le bas (deltaY > 0)
+          if (self.deltaY > 0) {
+            timelinePrincipale.play();
+          }
+        } else if (etatAnimation.value === 2) {
+          // Défilement continu et libre sans assistance (pas d'aimantation de carte)
+          let delta = 0;
+          let factor = 1.0;
 
-        if (etatAnimation === 2) {
-          scrollerGrille('gauche');
+          if (self.event.type === 'wheel') {
+            // Molette ou trackpad : combiné X et Y pour un défilement naturel
+            delta = self.deltaY + self.deltaX;
+            factor = 1.2; // Sensibilité ajustable
+          } else {
+            // Drag ou Touch : suit directement le mouvement du doigt
+            delta = self.deltaX + self.deltaY;
+            factor = -1.0; // Inversé pour que le contenu suive le geste
+          }
+
+          scrollerGrilleLibre(delta * factor);
         }
       },
       tolerance: 10,
       preventDefault: true
     });
+
+    if (aproposOuvert.value || offresOuvert.value || menuOuvert.value || pageCourante.value === 'projets') {
+      mainScrollObserver.disable();
+    }
 
   }, elementConteneur.value);
 
@@ -793,7 +803,8 @@ const initialiserAnimations = () => {
 };
 
 const onCarteClic = (expertiseId) => {
-  if (etatAnimation !== 2 || animationEnCours) return;
+  if (etatAnimation.value !== 2 || animationEnCours) return;
+  playShowingCard();
   animationEnCours = true;
 
   // 1. Obtenir les rectangles actuels des cartes sur l'écran (avec leur décalage de scroll !)
@@ -834,7 +845,7 @@ const onCarteClic = (expertiseId) => {
   let layerOldHero = elementImageMorph.value;
   let rectOldHero = act === 'photo' ? rectPhoto : (act === 'video' ? rectVideo : (act === 'graphique' ? rectGraphique : rectWeb));
 
-  // Positionner l'ancien Hero sur sa carte
+  // Positionner l'ancien Hero sur sa carte dans la grille
   gsapInstance.set(layerOldHero, {
     width: rectOldHero.width,
     height: rectOldHero.height,
@@ -846,36 +857,56 @@ const onCarteClic = (expertiseId) => {
     display: "block"
   });
 
-  // Positionner les 3 autres morph layers sur leurs cartes respectives
-  const confVideo = {
-    layer: elementMorphVideo.value,
-    rect: act === 'video' ? rectPhoto : rectVideo
-  };
-  const confGraphique = {
-    layer: elementMorphGraphique.value,
-    rect: act === 'graphique' ? rectPhoto : rectGraphique
-  };
-  const confWeb = {
-    layer: elementMorphWeb.value,
-    rect: act === 'web' ? rectPhoto : rectWeb
-  };
+  // Identifier le morph layer de la carte cliquée
+  let layerSelectionne = null;
+  if (expertiseId === act) {
+    layerSelectionne = layerOldHero;
+  } else if (expertiseId === 'video' || (act === 'video' && expertiseId === 'photo')) {
+    layerSelectionne = elementMorphVideo.value;
+  } else if (expertiseId === 'graphique' || (act === 'graphique' && expertiseId === 'photo')) {
+    layerSelectionne = elementMorphGraphique.value;
+  } else if (expertiseId === 'web' || (act === 'web' && expertiseId === 'photo')) {
+    layerSelectionne = elementMorphWeb.value;
+  }
 
-  [confVideo, confGraphique, confWeb].forEach(cfg => {
-    gsapInstance.set(cfg.layer, {
-      width: cfg.rect.width,
-      height: cfg.rect.height,
-      x: cfg.rect.left,
-      y: cfg.rect.top,
+  // Positionner la carte sélectionnée si elle est différente de l'ancien hero
+  if (layerSelectionne !== layerOldHero) {
+    let rectSelectionne = rectPhoto;
+    if (expertiseId === 'video') rectSelectionne = rectVideo;
+    if (expertiseId === 'graphique') rectSelectionne = rectGraphique;
+    if (expertiseId === 'web') rectSelectionne = rectWeb;
+
+    gsapInstance.set(layerSelectionne, {
+      width: rectSelectionne.width,
+      height: rectSelectionne.height,
+      x: rectSelectionne.left,
+      y: rectSelectionne.top,
       scaleX: 1,
       scaleY: 1,
       borderRadius: "0px",
       opacity: 1,
       display: "block"
     });
-  });
+  }
 
-  // 4. Cacher les vraies images de fond des cartes (pour laisser voir les morph layers qui se superposent)
-  gsapInstance.set(".expertise-carte .image-fond", { opacity: 0 });
+  // Cacher les autres morph layers inactifs pour éviter toute superposition visuelle
+  const otherLayers = [
+    elementMorphVideo.value,
+    elementMorphGraphique.value,
+    elementMorphWeb.value
+  ].filter(l => l !== layerSelectionne);
+  gsapInstance.set(otherLayers, { display: 'none', opacity: 0 });
+
+  // Cacher l'image de fond et le fond CSS de la carte sélectionnée
+  // (le fond #000 de .expertise-carte bloquait la vue sur le morph layer en dessous)
+  const activeCard = document.querySelector(`#carte-${expertiseId}`);
+  if (activeCard) {
+    gsapInstance.set(activeCard, { background: 'transparent' });
+  }
+  const activeCardImage = document.querySelector(`#carte-${expertiseId} .image-fond`);
+  if (activeCardImage) {
+    gsapInstance.set(activeCardImage, { opacity: 0 });
+  }
 
   // 5. Créer la timeline d'expansion / rétrécissement de retour
   const tlRetour = gsapInstance.timeline({
@@ -942,18 +973,50 @@ const onCarteClic = (expertiseId) => {
           clearProps: "all"
         });
 
-        etatAnimation = 1;
+        etatAnimation.value = 1;
         animationEnCours = false;
+
+        // Réinitialiser les propriétés transform des cartes (y, scale) pour éviter les décalages lors du prochain scroll
+        gsapInstance.set('.expertise-carte', { clearProps: 'y,scale,transform' });
       });
     }
   });
 
-  // Estomper en douceur les titres blancs des expertises et les overlays noirs des cartes
-  tlRetour.to(".nom-expertise", {
+  // Estomper et animer en douceur les lettres et titres de la carte active (effet ascenseur inversé haut + fade)
+  const activeLetters = document.querySelectorAll(`#carte-${expertiseId} .lettre-titre-carte`);
+  if (activeLetters.length > 0) {
+    tlRetour.to(activeLetters, {
+      y: "-50px",
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.02,
+      ease: "power2.in"
+    }, 0);
+  } else {
+    tlRetour.to(`#carte-${expertiseId} .nom-expertise`, {
+      y: "-30px",
+      opacity: 0,
+      duration: 0.6,
+      ease: "power2.in"
+    }, 0);
+  }
+
+  // Estomper également l'overlay noir de la carte active
+  const activeOverlay = document.querySelector(`#carte-${expertiseId} .image-overlay`);
+  if (activeOverlay) {
+    tlRetour.to(activeOverlay, {
+      opacity: 0,
+      duration: 0.6,
+      ease: "power2.out"
+    }, 0);
+  }
+
+  // Estomper tous les overlays des cartes inactives également (sinon ils restent opaques par-dessus)
+  const inactiveOverlays = Array.from(document.querySelectorAll('.expertise-carte .image-overlay')).filter(el => !el.closest(`#carte-${expertiseId}`));
+  tlRetour.to(inactiveOverlays, {
     opacity: 0,
-    y: -15,
-    duration: 0.7,
-    ease: "power2.in"
+    duration: 0.5,
+    ease: "power2.out"
   }, 0);
 
   // S'assurer que l'ancien texte principal s'estompe immédiatement s'il était encore visible
@@ -965,12 +1028,6 @@ const onCarteClic = (expertiseId) => {
     }, 0);
   }
 
-  tlRetour.to(".image-overlay", {
-    opacity: 0,
-    duration: 0.7,
-    ease: "power2.in"
-  }, 0);
-
   // Estomper en douceur la section des stats
   tlRetour.to(".conteneur-stats", {
     opacity: 0,
@@ -979,24 +1036,12 @@ const onCarteClic = (expertiseId) => {
     ease: "power2.inOut"
   }, 0);
 
-  // 6. Identifier le morph layer de la carte cliquée
-  let layerSelectionne = null;
-  if (expertiseId === act) {
-    layerSelectionne = layerOldHero;
-  } else if (expertiseId === 'video' || (act === 'video' && expertiseId === 'photo')) {
-    layerSelectionne = elementMorphVideo.value;
-  } else if (expertiseId === 'graphique' || (act === 'graphique' && expertiseId === 'photo')) {
-    layerSelectionne = elementMorphGraphique.value;
-  } else if (expertiseId === 'web' || (act === 'web' && expertiseId === 'photo')) {
-    layerSelectionne = elementMorphWeb.value;
-  }
-
   // 7. Animer le morph layer sélectionné pour qu'il prenne tout l'écran via un simple scale !
   let cardRectTarget = rectPhoto;
   if (expertiseId === 'video') cardRectTarget = rectVideo;
   if (expertiseId === 'graphique') cardRectTarget = rectGraphique;
   if (expertiseId === 'web') cardRectTarget = rectWeb;
-  
+
   const scaleToFillBack = Math.max(window.innerWidth / cardRectTarget.width, window.innerHeight / cardRectTarget.height);
   const targetXBack = (window.innerWidth - cardRectTarget.width) / 2;
   const targetYBack = (window.innerHeight - cardRectTarget.height) / 2;
@@ -1030,43 +1075,28 @@ const onCarteClic = (expertiseId) => {
     }, 0);
   }
 
-  // 8. Animer les 3 autres morph layers pour qu'ils rétrécissent vers leurs vignettes cibles !
-  const layersInactifs = [
-    { id: 'photo', layer: elementImageMorph.value, cardRect: rectPhoto },
-    { id: 'video', layer: elementMorphVideo.value, cardRect: rectVideo },
-    { id: 'graphique', layer: elementMorphGraphique.value, cardRect: rectGraphique },
-    { id: 'web', layer: elementMorphWeb.value, cardRect: rectWeb }
-  ].filter(item => item.id !== expertiseId);
+  // 8. Animer les CARTES INACTIVES DIRECTEMENT (elles glissent vers le bas, rétrécissent et s'estompent)
+  // Ainsi les textes et overlays à l'intérieur s'animent en parfaite harmonie
+  const cardsInactives = Array.from(document.querySelectorAll('.expertise-carte')).filter(card => card.id !== `carte-${expertiseId}`);
+  tlRetour.to(cardsInactives, {
+    opacity: 0,
+    y: "+=60", // Léger glissement vers le bas
+    scale: 0.9, // Léger rétrécissement global
+    duration: 0.8, // Durée courte pour disparaître proprement pendant que le principal s'étend
+    ease: "power2.out"
+  }, 0);
 
-  // Pour chacun des 3 inactifs, calculer leur scale de réduction et leur position cible dans la vignette
-  layersInactifs.forEach(item => {
-    let cardRect = item.cardRect;
-    let miniRect = rectsVignettes[item.id]; // Le slot cible a été mappé intelligemment plus haut
-
-    const scaleX = miniRect.width / cardRect.width;
-    const scaleY = miniRect.height / cardRect.height;
-    const targetX = miniRect.left + (miniRect.width - cardRect.width) / 2;
-    const targetY = miniRect.top + (miniRect.height - cardRect.height) / 2;
-
-    tlRetour.to(item.layer, {
-      x: targetX,
-      y: targetY,
-      scaleX: scaleX,
-      scaleY: scaleY,
-      borderRadius: "0px",
-      duration: 1.8,
-      ease: "power3.inOut"
+  // Animer également le morph de l'ancien hero s'il fait partie des éléments inactifs
+  if (layerOldHero !== layerSelectionne) {
+    tlRetour.to(layerOldHero, {
+      opacity: 0,
+      y: "+=60",
+      scaleX: 0.9,
+      scaleY: 0.9,
+      duration: 0.8,
+      ease: "power2.out"
     }, 0);
-
-    const overlayMini = item.layer.querySelector('.overlay-morph-mini, .overlay-morph-discret');
-    if (overlayMini) {
-      tlRetour.to(overlayMini, {
-        opacity: 1,
-        duration: 1.8,
-        ease: "power3.inOut"
-      }, 0);
-    }
-  });
+  }
 
   // Réactiver le menu horizontal du milieu
   gsapInstance.set(elementLiensNav.value, { display: 'flex' });
@@ -1086,8 +1116,300 @@ const onCarteClic = (expertiseId) => {
   }, 0);
 };
 
+const ouvrirProjetsDepuisHero = () => {
+  if (etatAnimation.value !== 1 || animationEnCours || menuOuvert.value) return;
+  animationEnCours = true;
+  fermerToutesLesPages();
+
+  // Animation de transition vers la vue projets depuis le Hero
+  const tlProjets = gsapInstance.timeline({
+    onComplete: () => {
+      pageCourante.value = 'projets';
+      animationEnCours = false;
+    }
+  });
+
+  // 1. Estomper les éléments Héro (slogan, menu gauche, pagination, miniatures)
+  tlProjets.to([
+    elementSlogan.value,
+    elementMenuGauche.value,
+    elementPagination.value,
+    elementLiensNav.value,
+    '.miniature-cadre'
+  ], {
+    opacity: 0,
+    y: (index, target) => {
+      if (target === elementSlogan.value || target === elementLiensNav.value) return -45;
+      return 45;
+    },
+    duration: 0.6,
+    stagger: 0.05,
+    ease: "power2.inOut"
+  }, 0);
+
+  // Masquer les miniatures et le bouton d'offres
+  tlProjets.to(elementBoutonOffres.value, {
+    opacity: 0,
+    scale: 0.9,
+    duration: 0.3,
+    onComplete: () => {
+      gsapInstance.set(elementBoutonOffres.value, { display: 'none' });
+      gsapInstance.set(elementLiensNav.value, { display: 'flex' });
+    }
+  }, 0);
+
+  tlProjets.to(elementLiensNav.value, {
+    opacity: 1,
+    y: 0,
+    duration: 0.5,
+    ease: "power2.out"
+  }, 0.3);
+};
+
+const ouvrirPortfolioDepuisHero = () => {
+  if (etatAnimation.value !== 1 || animationEnCours || menuOuvert.value) return;
+  animationEnCours = true;
+
+  const tlProjets = gsapInstance.timeline({
+    onComplete: () => {
+      pageCourante.value = 'portfolio';
+      animationEnCours = false;
+    }
+  });
+
+  tlProjets.to([
+    elementSlogan.value,
+    elementMenuGauche.value,
+    elementPagination.value,
+    elementLiensNav.value,
+    '.miniature-cadre'
+  ], {
+    opacity: 0,
+    y: (index, target) => {
+      if (target === elementSlogan.value || target === elementLiensNav.value) return -45;
+      return 45;
+    },
+    duration: 0.6,
+    stagger: 0.05,
+    ease: "power2.inOut"
+  }, 0);
+
+  tlProjets.to(elementBoutonOffres.value, {
+    opacity: 0,
+    scale: 0.9,
+    duration: 0.3,
+    onComplete: () => {
+      gsapInstance.set(elementBoutonOffres.value, { display: 'none' });
+      gsapInstance.set(elementLiensNav.value, { display: 'flex' });
+    }
+  }, 0);
+
+  tlProjets.to(elementLiensNav.value, {
+    opacity: 1,
+    y: 0,
+    duration: 0.5,
+    ease: "power2.out"
+  }, 0.3);
+};
+
+const ouvrirPortfolio = () => {
+  if (menuOuvert.value) menuOuvert.value = false;
+  fermerToutesLesPages();
+
+  if (pageCourante.value === 'portfolio') return;
+
+  if (pageCourante.value === 'projets') {
+    pageCourante.value = 'portfolio';
+    return;
+  }
+
+  if (etatAnimation.value === 2) {
+    animationEnCours = true;
+    const tlProjets = gsapInstance.timeline({
+      onComplete: () => {
+        pageCourante.value = 'portfolio';
+        animationEnCours = false;
+      }
+    });
+    tlProjets.to([elementSectionExpertises.value, '.conteneur-stats'], {
+      opacity: 0,
+      y: 45,
+      duration: 0.5,
+      ease: "power2.inOut"
+    }, 0);
+    tlProjets.to(elementBoutonOffres.value, {
+      opacity: 0,
+      scale: 0.9,
+      duration: 0.3,
+      onComplete: () => {
+        gsapInstance.set(elementBoutonOffres.value, { display: 'none' });
+        gsapInstance.set(elementLiensNav.value, { display: 'flex' });
+      }
+    }, 0);
+    tlProjets.to(elementLiensNav.value, {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      ease: "power2.out"
+    }, 0.3);
+  } else {
+    ouvrirPortfolioDepuisHero();
+  }
+};
+
+const retournerAExpertises = () => {
+  if (animationEnCours) return;
+  animationEnCours = true;
+
+  // Animer la transition vers la grille d'accueil (État 2)
+  pageCourante.value = 'accueil';
+  playHomeCardApparition();
+
+  const tlRetourGrid = gsapInstance.timeline({
+    onComplete: () => {
+      animationEnCours = false;
+    }
+  });
+
+  // S'assurer que le conteneur de la grille est visible
+  gsapInstance.set(elementSectionExpertises.value, { visibility: 'visible', opacity: 1 });
+
+  // 1. Réapparaître la grille et les statistiques
+  tlRetourGrid.fromTo(['.expertises-grille', '.conteneur-stats'], {
+    opacity: 0,
+    y: 45
+  }, {
+    opacity: 1,
+    y: 0,
+    duration: 0.8,
+    ease: "power2.out"
+  }, 0);
+
+  // 2. Masquer les liens nav et afficher le bouton offres
+  tlRetourGrid.to(elementLiensNav.value, {
+    opacity: 0,
+    y: -15,
+    duration: 0.3,
+    onComplete: () => {
+      gsapInstance.set(elementLiensNav.value, { display: 'none' });
+      gsapInstance.set(elementBoutonOffres.value, { display: 'block' });
+    }
+  }, 0);
+
+  tlRetourGrid.to(elementBoutonOffres.value, {
+    opacity: 1,
+    scale: 1,
+    duration: 0.5,
+    ease: "back.out(1.5)"
+  }, 0.3);
+};
+
+const gererClicExpertises = () => {
+  if (pageCourante.value === 'projets' || pageCourante.value === 'portfolio') {
+    // Si on est dans les projets ou portfolio et qu'on clique sur "Nos expertises",
+    // on retourne à l'accueil (grille).
+    pageCourante.value = 'accueil';
+
+    // Si la page était en état 1 (Hero), on joue l'animation pour aller au Grid (état 2)
+    if (etatAnimation.value === 1) {
+      nextTick(() => {
+        animationEnCours = true;
+        timelinePrincipale.play();
+      });
+    } else {
+      // Sinon, si on était déjà à l'état 2, on retourne simplement à la grille
+      retournerAExpertises();
+    }
+  } else if (etatAnimation.value === 1 && !animationEnCours) {
+    timelinePrincipale.play();
+  }
+};
+
+const retournerAHero = () => {
+  if (animationEnCours) return;
+  animationEnCours = true;
+
+  if (mainScrollObserver) mainScrollObserver.disable();
+
+  // Reset des états réactifs
+  pageCourante.value = 'accueil';
+  projetActifDetail.value = null;
+  menuOuvert.value = false;
+  offresOuvert.value = false;
+  aproposOuvert.value = false;
+  contactOuvert.value = false;
+  activeExpertise.value = 'photo';
+  etatAnimation.value = 1;
+
+  if (window.location.hash) {
+    history.pushState("", document.title, window.location.pathname + window.location.search);
+  }
+
+  // Masquer le bouton offres et préparer les éléments du Hero pour la révélation
+  gsapInstance.set(elementLiensNav.value, { display: 'flex', opacity: 1, y: 0 });
+  gsapInstance.set(elementBoutonOffres.value, { display: 'none', opacity: 0 });
+  gsapInstance.set([
+    elementSlogan.value,
+    elementMenuGauche.value,
+    elementPagination.value,
+    '.miniature-cadre'
+  ], { opacity: 0, y: 25 });
+  gsapInstance.set(".signe-plus-css", { opacity: 0, scale: 0.5, rotation: 90 });
+
+  // Revenir en haut de la page et réinitialiser les animations GSAP
+  window.scrollTo(0, 0);
+  initialiserAnimations();
+
+  // Reconfigurer le masquage après initialiserAnimations
+  gsapInstance.set(elementBoutonOffres.value, { display: 'none', opacity: 0 });
+  gsapInstance.set([
+    elementSlogan.value,
+    elementMenuGauche.value,
+    elementPagination.value,
+    '.miniature-cadre'
+  ], { opacity: 0, y: 25 });
+  gsapInstance.set(".signe-plus-css", { opacity: 0, scale: 0.5, rotation: 90 });
+
+  // Animation de révélation fluide du Hero
+  const tlReveal = gsapInstance.timeline({
+    onComplete: () => {
+      animationEnCours = false;
+      if (mainScrollObserver) mainScrollObserver.enable();
+    }
+  });
+
+  tlReveal.fromTo([
+    elementSlogan.value,
+    elementMenuGauche.value,
+    elementPagination.value,
+    '.miniature-cadre'
+  ], {
+    opacity: 0,
+    y: 25
+  }, {
+    opacity: 1,
+    y: 0,
+    duration: 0.7,
+    stagger: 0.06,
+    ease: "power2.out"
+  });
+
+  tlReveal.fromTo(".signe-plus-css", {
+    rotation: 90,
+    scale: 0.5,
+    opacity: 0
+  }, {
+    rotation: 0,
+    scale: 1,
+    opacity: 1,
+    duration: 0.6,
+    ease: "back.out(1.5)"
+  }, "-=0.5");
+};
+
 const onMiniatureClic = (targetId) => {
-  if (etatAnimation !== 1 || animationEnCours) return;
+  if (etatAnimation.value !== 1 || animationEnCours) return;
+  playShowingCard();
   animationEnCours = true;
 
   // Masquer l'overlay de survol et le texte immédiatement au clic
@@ -1098,7 +1420,7 @@ const onMiniatureClic = (targetId) => {
   gsapInstance.set(".miniature-img", { opacity: 0 });
 
   const sourceId = activeExpertise.value;
-  
+
   // 1. Récupérer les rectangles des 3 slots de miniatures physiques dans le DOM
   const parentMiniatures = elementMiniatures.value;
   if (!parentMiniatures) {
@@ -1110,7 +1432,7 @@ const onMiniatureClic = (targetId) => {
     animationEnCours = false;
     return;
   }
-  
+
   const rectSlot1 = slotsCadres[0].getBoundingClientRect();
   const rectSlot2 = slotsCadres[1].getBoundingClientRect();
   const rectSlot3 = slotsCadres[2].getBoundingClientRect();
@@ -1197,7 +1519,7 @@ const onMiniatureClic = (targetId) => {
   expertisesGlissantes.forEach(exp => {
     const indexAvant = miniaturesFiltrees.value.findIndex(e => e.id === exp.id);
     const indexApres = nouvellesMiniatures.findIndex(e => e.id === exp.id);
-    
+
     // Si l'index de slot a changé, on anime le morph layer correspondant vers son nouveau slot
     if (indexAvant !== indexApres && indexAvant !== -1 && indexApres !== -1) {
       const layerGlissant = obtenirMorphLayerPourExpertise(exp.id);
@@ -1254,32 +1576,129 @@ const obtenirMorphLayerPourExpertise = (id) => {
   return null;
 };
 
+watch([aproposOuvert, offresOuvert, menuOuvert, pageCourante, projetActifDetail], ([ap, off, men, page, detail]) => {
+  if (mainScrollObserver) {
+    if (ap || off || men || page === 'projets' || page === 'portfolio' || detail) {
+      mainScrollObserver.disable();
+    } else {
+      mainScrollObserver.enable();
+    }
+  }
+}, { immediate: true });
+
+// Play delayed cursor with text click sound effect when Offres, A propos, and Contact overlays open
+watch(offresOuvert, (val) => {
+  if (val) {
+    setTimeout(() => playCursorWithTextClick(), 550);
+  }
+});
+watch(aproposOuvert, (val) => {
+  if (val) {
+    setTimeout(() => playCursorWithTextClick(), 550);
+  }
+});
+watch(contactOuvert, (val) => {
+  if (val) {
+    setTimeout(() => playCursorWithTextClick(), 550);
+  }
+});
+
+const jouerAnimationEntree = () => {
+  animationEnCours = true;
+  
+  // 1. Initialiser le setup (mesurer les coordonnées, cacher la grille, etc.)
+  initialiserAnimations();
+
+  // Jouer le son d'apparition
+  playCursorWithTextClick();
+
+  // 2. Créer la timeline d'entrée
+  const tlReveal = gsapInstance.timeline({
+    onComplete: () => {
+      animationEnCours = false;
+      if (mainScrollObserver) mainScrollObserver.enable();
+    }
+  });
+
+  // Animer le header
+  tlReveal.fromTo('.header-epik', {
+    opacity: 0,
+    y: -20
+  }, {
+    opacity: 1,
+    y: 0,
+    duration: 0.8,
+    ease: "power2.out"
+  }, 0);
+
+  // Animer les éléments satellites (slogan, menu gauche, pagination, miniatures)
+  tlReveal.fromTo([
+    elementSlogan.value,
+    elementMenuGauche.value,
+    elementPagination.value,
+    '.miniature-cadre'
+  ], {
+    opacity: 0,
+    y: 35
+  }, {
+    opacity: 1,
+    y: 0,
+    duration: 0.9,
+    stagger: 0.08,
+    ease: "power2.out"
+  }, 0.15);
+
+  // Animer les signes plus
+  tlReveal.fromTo(".signe-plus-css", {
+    rotation: 90,
+    scale: 0.5,
+    opacity: 0
+  }, {
+    rotation: 0,
+    scale: 1,
+    opacity: 1,
+    duration: 0.8,
+    ease: "back.out(1.5)"
+  }, 0.45);
+};
+
+watch(() => props.startEntrance, (val) => {
+  if (val) {
+    jouerAnimationEntree();
+  }
+});
+
 const surResize = () => {
   ScrollTrigger.refresh();
 };
 
 onMounted(() => {
+  if (headerRef.value) {
+    elementLiensNav.value = headerRef.value.elementLiensNav;
+    elementBoutonOffres.value = headerRef.value.elementBoutonOffres;
+  }
   // Réinitialisation forcée du défilement vers le haut
   if (history.scrollRestoration) {
     history.scrollRestoration = 'manual';
   }
   window.scrollTo(0, 0);
 
-  setTimeout(() => {
+  if (props.startEntrance) {
+    jouerAnimationEntree();
+  } else {
+    // Mesurer et configurer les éléments en arrière-plan
     initialiserAnimations();
-    gsapInstance.fromTo(".miniature-cadre", {
-      scaleX: 0.8,
-      opacity: 0,
-      transformOrigin: "left center"
-    }, {
-      scaleX: 1,
-      opacity: 1,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: "power2.out",
-      clearProps: "all"
-    });
-  }, 500);
+
+    // Forcer le masquage au départ en attendant le signal startEntrance
+    gsapInstance.set([
+      elementSlogan.value,
+      elementMenuGauche.value,
+      elementPagination.value,
+      '.miniature-cadre',
+      '.header-epik'
+    ], { opacity: 0, y: 25 });
+    gsapInstance.set(".signe-plus-css", { opacity: 0, scale: 0.5, rotation: 90 });
+  }
 
   window.addEventListener('resize', surResize);
 });
@@ -1296,111 +1715,13 @@ onBeforeUnmount(() => {
 .accueil-conteneur {
   width: 100%;
   height: 100vh;
+  scrollbar-width: none;
   overflow: hidden;
   position: relative;
   background-color: var(--couleur-fond);
 }
 
-.entete-principale {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 3rem 7rem 4%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 100;
-}
 
-.logo-conteneur {
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
-
-.logo-image {
-  height: 55px;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-}
-
-.navigation-milieu {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-}
-
-.liens-navigation {
-  display: flex;
-  gap: 2.5rem;
-  align-items: center;
-}
-
-.lien-nav {
-  font-size: 1.3rem;
-  font-weight: 500;
-  color: var(--couleur-gris-secondaire);
-  position: relative;
-  padding: 0.4rem 0;
-  transition: var(--transition-rapide);
-}
-
-.lien-nav.actif {
-  color: var(--couleur-texte);
-}
-
-.lien-nav:hover {
-  color: var(--couleur-texte);
-}
-
-.conteneur-bouton-offres {
-  pointer-events: auto;
-}
-
-.bouton-offres {
-  background: var(--couleur-bleu);
-  color: var(--couleur-texte);
-  font-size: 1.1rem;
-  font-weight: 300;
-  padding: 0.6rem 1rem;
-  border-radius: 0px;
-  display: flex;
-  align-items: center;
-  gap: 2.8rem;
-  box-shadow: 0 4px 20px rgba(0, 130, 200, 0.35);
-  transition: var(--transition-douce);
-}
-
-.bouton-offres:hover {
-  background-color: var(--couleur-bleu-survol);
-  box-shadow: 0 6px 25px rgba(0, 130, 200, 0.5);
-}
-
-.bouton-offres:active {
-  transform: translateY(0);
-}
-
-.plus-gauche,
-.plus-droit {
-  font-weight: 400;
-  font-size: 1.5rem;
-  display: inline-block;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.bouton-offres:hover .plus-gauche {
-  transform: rotate(180deg);
-}
-
-.bouton-offres:hover .plus-droit {
-  transform: rotate(-180deg);
-}
 
 /* Section Héro */
 .section-hero {
@@ -1482,6 +1803,7 @@ onBeforeUnmount(() => {
   gap: 5.5rem;
   text-align: center;
   color: var(--couleur-texte);
+  pointer-events: none;
 }
 
 .titre-principal {
@@ -1494,8 +1816,13 @@ onBeforeUnmount(() => {
 }
 
 @keyframes monterAscenseur {
-  from { transform: translateY(115%); }
-  to { transform: translateY(0%); }
+  from {
+    transform: translateY(115%);
+  }
+
+  to {
+    transform: translateY(0%);
+  }
 }
 
 .lettre-titre-hero {
@@ -1519,6 +1846,7 @@ onBeforeUnmount(() => {
     transform: rotate(-180deg) scale(0.4);
     opacity: 0;
   }
+
   to {
     transform: rotate(0deg) scale(1);
     opacity: 1;
@@ -1619,7 +1947,8 @@ onBeforeUnmount(() => {
   border-radius: 0px;
   overflow: hidden;
   cursor: pointer;
-  transition: var(--transition-douce);
+  /* Désactivation de transition: all pour éviter tout conflit avec les animations GSAP */
+  transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
 }
 
@@ -1628,7 +1957,8 @@ onBeforeUnmount(() => {
   height: 100%;
   object-fit: cover;
   display: block;
-  opacity: 1; /* Fix : Les images physiques sont visibles par défaut dans l'État 1 ! */
+  opacity: 1;
+  /* Fix : Les images physiques sont visibles par défaut dans l'État 1 ! */
 }
 
 .miniature-cadre.actif {
@@ -1638,7 +1968,8 @@ onBeforeUnmount(() => {
 .miniature-survol-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(5, 5, 5, 0.35); /* Très léger overlay */
+  background: rgba(5, 5, 5, 0.35);
+  /* Très léger overlay */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1665,7 +1996,8 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 5;
+  z-index: 20;
+  /* Placé au-dessus des morph layers (z-index 15) pour pouvoir animer les textes des cartes */
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
@@ -1676,7 +2008,7 @@ onBeforeUnmount(() => {
 }
 
 /* Responsivité tablettes et mobiles */
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .titre-principal {
     font-size: 1.8rem;
   }
@@ -1713,7 +2045,7 @@ onBeforeUnmount(() => {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .titre-principal {
     font-size: 1.5rem;
   }
@@ -1722,12 +2054,50 @@ onBeforeUnmount(() => {
     display: none;
   }
 
-  .entete-principale {
-    padding: 2rem 5%;
-  }
-
   .menu-bas-gauche {
     display: none;
   }
+}
+
+@media (max-width: 480px) {
+  .titre-principal {
+    font-size: 1.2rem;
+  }
+}
+
+/* Animation de transition pour la vue projets */
+.fondu-projets-enter-active,
+.fondu-projets-leave-active {
+  transition: opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.fondu-projets-enter-from,
+.fondu-projets-leave-to {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+/* Transition spécifique pour le portfolio (pas de scale pour les perfs WebGL) */
+.fondu-portfolio-enter-active,
+.fondu-portfolio-leave-active {
+  transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.fondu-portfolio-enter-from,
+.fondu-portfolio-leave-to {
+  opacity: 0;
+}
+
+/* Rideau de transition spécial pour le logo */
+.transition-curtain {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #050505 0%, #0072B1 100%);
+  z-index: 9999;
+  transform: translateY(100%);
+  pointer-events: none;
 }
 </style>

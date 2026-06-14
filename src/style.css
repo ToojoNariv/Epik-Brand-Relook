@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 :root {
   --couleur-fond: #050505;
@@ -81,4 +81,11 @@ button {
 #app {
   width: 100%;
   min-height: 100vh;
+}
+
+/* Masquer le curseur système par défaut sur ordinateur pour utiliser le curseur personnalisé */
+@media (pointer: fine) {
+  body, html, a, button, input, select, textarea, [role="button"], * {
+    cursor: none !important;
+  }
 }
