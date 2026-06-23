@@ -8,7 +8,9 @@ export const en = {
     sendRequest: "Send request",
     errorRequired: "This field is required",
     successMerci: "Thank you!",
-    successDemande: "Request received!"
+    successDemande: "Request received!",
+    loaderWait: "Please wait during this one-time load",
+    errorSubmit: "An error occurred while sending. Please try again."
   },
   menu: {
     expertises: "Our expertise",
@@ -137,5 +139,30 @@ export const en = {
     graphique: "Graphic Design",
     video: "Video Editing",
     web: "Web Development"
+  },
+  seo: {
+    title: {
+      home: "Epik Brand | Creative Agency in Madagascar - Photo, Video, Design & Web",
+      photo: "Professional Photography Studio | Epik Brand",
+      video: "Video Production & Editing | Epik Brand",
+      graphique: "Graphic Design & Visual Identity | Epik Brand",
+      web: "Web Development & Creative Websites | Epik Brand",
+      portfolio: "Creative Projects Portfolio | Epik Brand",
+      offres: "Our Offers & Pricing | Epik Brand",
+      apropos: "About Our Agency | Epik Brand",
+      contact: "Contact Our Agency | Epik Brand"
+    },
+    description: {
+      home: "Combine the power of a brand strategy with visual thrills. Creative agency specializing in rebranding, studio photography, video production, graphic design, and web development in Antananarivo, Madagascar.",
+      photo: "Professional photography services in Madagascar. Studio shoots, product packshots, corporate portraits, and art direction to elevate your brand image.",
+      video: "Production of high-quality advertising and corporate videos. Scriptwriting, shooting, and editing of dynamic videos to capture your customers' attention.",
+      graphique: "Creation of logos, complete graphic guidelines, brand designs, and impactful communication materials to establish your visual identity.",
+      web: "Creation of custom, fast, and SEO-optimized professional websites. Exceptional e-commerce solutions and interactive showcases.",
+      portfolio: "Discover our portfolio of creative projects: achievements in photography, video, graphic identity design, and websites developed by Epik Brand.",
+      offres: "Discover our tailor-made offers for your brand communication: professional photography, Full HD video production, graphic identity design, and optimized website creation.",
+      apropos: "Get to know the team behind creative agency Epik Brand in Soavimasoandro, Antananarivo. Discover our operational principles based on commitment and excellence.",
+      contact: "Let's discuss your rebranding, photo shoot, video production, or website creation project. Write to us or book your call to bring your ideas to life."
+    },
+    keywords: "Epik Brand, creative agency Madagascar, rebranding, studio photography, video editing Antananarivo, web design, website development, visual identity, photo shoot Madagascar, audiovisual production"
   }
 };

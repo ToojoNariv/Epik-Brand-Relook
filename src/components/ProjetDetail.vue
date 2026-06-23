@@ -26,7 +26,7 @@
     >
       <div class="track-miniatures-liste">
         <div 
-          v-for="(media, index) in projet.galerie" 
+          v-for="(media, index) in listeMediasComplete" 
           :key="index"
           :class="['track-miniature-item', { 'actif': activeMediaIndex === index }]"
           @click="scrollerVersMedia(index)"
@@ -92,7 +92,7 @@
       <section class="galerie-section">
         <div class="galerie-conteneur">
           <div 
-            v-for="(media, index) in projet.galerie.slice(1)" 
+            v-for="(media, index) in listeMediasComplete.slice(1)" 
             :key="index"
             :id="'media-' + (index + 1)"
             class="galerie-item-wrapper"
@@ -169,7 +169,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { gsap } from 'gsap';
 import { estEnLecture, playDefaultClick, playScrollTick, playCursorWithTextClick } from '../services/audioService';
 import { t } from '../i18n/index';
@@ -188,6 +188,21 @@ const heroRef = ref(null);
 const trackRef = ref(null);
 const activeMediaIndex = ref(0);
 const progressObj = ref({});
+
+const listeMediasComplete = computed(() => {
+  if (!props.projet) return [];
+  
+  const coverItem = {
+    type: props.projet.mediaType || 'image',
+    src: props.projet.src
+  };
+
+  // Filtrer la galerie pour enlever tout doublon avec l'image de couverture
+  const galleryItems = props.projet.galerie || [];
+  const filteredGallery = galleryItems.filter(item => item.src !== props.projet.src);
+
+  return [coverItem, ...filteredGallery];
+});
 
 // ─── ETATS DU LECTEUR VIDÉO CUSTOM ───
 const videoStates = ref({});
@@ -815,15 +830,27 @@ onBeforeUnmount(() => {
   }
   
   .hero-section {
-    padding: 0 5vw 6vh;
+    padding: 0 5vw 8vh !important;
+    justify-content: flex-end !important;
+  }
+  
+  .hero-contenu {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    padding-bottom: 0 !important;
+    max-width: 80% !important;
   }
   
   .galerie-item-wrapper {
-    width: 82vw;
+    width: 100vw !important;
   }
   
   .track-navigation-latérale {
-    display: none;
+    display: flex !important;
+    right: 2vw !important;
+    top: 38% !important;
+    scale: 0.8 !important;
+    transform-origin: right center !important;
   }
 }
 
@@ -837,12 +864,13 @@ onBeforeUnmount(() => {
   }
 
   .bouton-retour {
-    padding: 8px 18px;
-    font-size: 0.75rem;
+    padding: 10px 22px !important;
+    font-size: 1.1rem !important;
+    gap: 1rem !important;
   }
   
   .projet-titre {
-    font-size: 2.2rem;
+    font-size: 2.5rem !important;
   }
   
   .projet-description {
@@ -850,7 +878,12 @@ onBeforeUnmount(() => {
   }
   
   .galerie-item-wrapper {
-    width: 90vw;
+    width: 100vw !important;
+  }
+  
+  .track-navigation-latérale {
+    scale: 0.7 !important;
+    top: 35% !important;
   }
 }
 

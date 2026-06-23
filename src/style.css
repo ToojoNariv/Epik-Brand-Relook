@@ -32,6 +32,8 @@ html, body {
   font-family: var(--police-texte);
   overflow-x: hidden;
   min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
+  min-height: 100dvh;
   width: 100%;
 }
 
@@ -81,6 +83,8 @@ button {
 #app {
   width: 100%;
   min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
+  min-height: 100dvh;
 }
 
 /* Masquer le curseur système par défaut sur ordinateur pour utiliser le curseur personnalisé */

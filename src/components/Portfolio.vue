@@ -2,31 +2,6 @@
   <div class="projets-view-conteneur">
     <!-- Colonne gauche : Grille des projets (scrollable) -->
     <div class="projets-grille-section" ref="grilleSectionRef">
-      <!-- Filtre visible uniquement sur mobile/tablette -->
-      <div class="mobile-trier-select-conteneur">
-        <span class="trier-label">Trier par</span>
-        <div class="custom-select-root mobile-select">
-          <div class="custom-select-trigger" @click="toggleDropdown">
-            <span class="custom-select-value">{{ optionLabel(filtreSelectionne) }}</span>
-            <div class="custom-select-caret">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-          </div>
-          <div class="custom-select-panel">
-            <div 
-              v-for="opt in optionsFiltre" 
-              :key="'m-'+opt.value"
-              :class="['custom-select-option', { 'actif': filtreSelectionne === opt.value }]"
-              @click="choisirOption(opt.value)"
-            >
-              {{ opt.label }}
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Grille de cartes -->
       <div class="projets-grid" ref="gridRef">
         <div 
@@ -51,8 +26,9 @@
               :alt="projet.titre.join(' ')" 
               class="projet-media" 
               draggable="false"
-              loading="lazy"
+              loading="eager"
               decoding="async"
+              fetchpriority="high"
             />
             <div class="projet-overlay-shadow"></div>
           </div>
@@ -72,6 +48,7 @@
           ref="splineViewerRef"
           url="https://prod.spline.design/Q4niLZ8HYuhlezDo/scene.splinecode"
           events-target="container"
+          loading-anim-type="none"
         >
           <div class="spline-fallback"></div>
         </spline-viewer>
@@ -106,6 +83,31 @@
       </div>
     </div>
 
+    <!-- Filtre visible uniquement sur mobile/tablette (fixed en bas) -->
+    <div class="mobile-trier-select-conteneur" ref="mobileCustomSelectRef">
+      <span class="trier-label">Trier par</span>
+      <div class="custom-select-root mobile-select">
+        <div class="custom-select-trigger" @click="toggleDropdown" ref="mobileSelectTriggerRef">
+          <span class="custom-select-value">{{ optionLabel(filtreSelectionne) }}</span>
+          <div class="custom-select-caret" ref="mobileSelectCaretRef">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="custom-select-panel" ref="mobileSelectPanelRef">
+          <div 
+            v-for="opt in optionsFiltre" 
+            :key="'m-'+opt.value"
+            :class="['custom-select-option', { 'actif': filtreSelectionne === opt.value }]"
+            @click="choisirOption(opt.value)"
+          >
+            {{ opt.label }}
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -119,7 +121,8 @@ const props = defineProps({
   visible: { type: Boolean, default: false }
 });
 
-const emit = defineEmits(['close', 'open-detail']);// ─── DONNÉES DES PROJETS ─────────────────────────────────────────────────────
+const emit = defineEmits(['close', 'open-detail']);
+// ─── DONNÉES DES PROJETS ─────────────────────────────────────────────────────
 import { projects } from '../services/apiService';
 
 const projetsParExpertise = computed(() => {
@@ -184,17 +187,39 @@ const selectTriggerRef = ref(null);
 const selectPanelRef = ref(null);
 const selectCaretRef = ref(null);
 const selectConteneurRef = ref(null);
+
+const mobileCustomSelectRef = ref(null);
+const mobileSelectTriggerRef = ref(null);
+const mobileSelectPanelRef = ref(null);
+const mobileSelectCaretRef = ref(null);
+
 const dropdownOuvert = ref(false);
 
 const toggleDropdown = () => {
   dropdownOuvert.value ? fermerDropdown() : ouvrirDropdown();
 };
 
+const obtenirRefsActives = () => {
+  if (isMobile.value) {
+    return {
+      panel: mobileSelectPanelRef.value,
+      caret: mobileSelectCaretRef.value,
+      trigger: mobileSelectTriggerRef.value,
+      root: mobileCustomSelectRef.value
+    };
+  }
+  return {
+    panel: selectPanelRef.value,
+    caret: selectCaretRef.value,
+    trigger: selectTriggerRef.value,
+    root: customSelectRef.value
+  };
+};
+
 const ouvrirDropdown = () => {
   dropdownOuvert.value = true;
   playCursorWithTextClick();
-  const panel = selectPanelRef.value;
-  const caret = selectCaretRef.value;
+  const { panel, caret } = obtenirRefsActives();
   const options = panel?.querySelectorAll('.custom-select-option');
   if (!panel) return;
 
@@ -202,7 +227,14 @@ const ouvrirDropdown = () => {
   if (options) gsap.killTweensOf(options);
 
   // Reveal panel
-  gsap.set(panel, { display: 'flex', opacity: 0, y: -8, scaleY: 0.7, transformOrigin: 'top center' });
+  const isMob = isMobile.value;
+  gsap.set(panel, { 
+    display: 'flex', 
+    opacity: 0, 
+    y: isMob ? 8 : -8, 
+    scaleY: 0.7, 
+    transformOrigin: isMob ? 'bottom center' : 'top center' 
+  });
   gsap.to(panel, {
     opacity: 1, y: 0, scaleY: 1,
     duration: 0.45,
@@ -210,7 +242,9 @@ const ouvrirDropdown = () => {
   });
 
   // Rotate caret
-  gsap.to(caret, { rotation: 180, duration: 0.35, ease: 'power2.out' });
+  if (caret) {
+    gsap.to(caret, { rotation: 180, duration: 0.35, ease: 'power2.out' });
+  }
 
   // Stagger the options
   if (options && options.length) {
@@ -223,15 +257,20 @@ const ouvrirDropdown = () => {
 
 const fermerDropdown = () => {
   dropdownOuvert.value = false;
-  const panel = selectPanelRef.value;
-  const caret = selectCaretRef.value;
+  const { panel, caret } = obtenirRefsActives();
   if (!panel) return;
 
   gsap.killTweensOf([panel, caret]);
 
-  gsap.to(caret, { rotation: 0, duration: 0.3, ease: 'power2.inOut' });
+  if (caret) {
+    gsap.to(caret, { rotation: 0, duration: 0.3, ease: 'power2.inOut' });
+  }
+  
+  const isMob = isMobile.value;
   gsap.to(panel, {
-    opacity: 0, y: -8, scaleY: 0.7,
+    opacity: 0, 
+    y: isMob ? 8 : -8, 
+    scaleY: 0.7,
     duration: 0.28,
     ease: 'power2.in',
     onComplete: () => { gsap.set(panel, { display: 'none' }); }
@@ -239,7 +278,7 @@ const fermerDropdown = () => {
 };
 
 const choisirOption = (val) => {
-  const trigger = selectTriggerRef.value;
+  const { trigger } = obtenirRefsActives();
   if (trigger) {
     // Flash micro-animation on trigger
     gsap.fromTo(trigger, { scale: 0.97 }, { scale: 1, duration: 0.35, ease: 'elastic.out(1.2, 0.5)' });
@@ -250,7 +289,8 @@ const choisirOption = (val) => {
 
 // Fermer le dropdown si on clique en dehors
 const surClicExterieur = (e) => {
-  if (dropdownOuvert.value && customSelectRef.value && !customSelectRef.value.contains(e.target)) {
+  const { root } = obtenirRefsActives();
+  if (dropdownOuvert.value && root && !root.contains(e.target)) {
     fermerDropdown();
   }
 };
@@ -311,7 +351,12 @@ const injecterScriptSpline = () => {
 const chargerSplineRobot = () => {
   if (isMobile.value || showSpline.value) return;
   injecterScriptSpline();
-  showSpline.value = true;
+  // Retarder l'apparition du Spline pour ne pas faire saccader l'animation d'ouverture de la page
+  setTimeout(() => {
+    if (!isMobile.value) {
+      showSpline.value = true;
+    }
+  }, 600);
 };
 
 watch(isMobile, (newValue) => {
@@ -322,15 +367,10 @@ watch(isMobile, (newValue) => {
 
 watch(() => props.visible, (isVisible) => {
   if (isVisible) {
-    // Si l'utilisateur clique sur le portfolio avant la fin du délai en arrière-plan, on force le chargement immédiat
     chargerSplineRobot();
-    
     const filtrePrecedent = filtreSelectionne.value;
-    filtreSelectionne.value = props.categorie; // Sync le filtre avec l'expertise active
-
-    // Si le filtre n'a pas changé, on lance manuellement l'animation
-    // S'il a changé, le watch(filtreSelectionne) s'en chargera pour éviter de double animer
-    if (filtrePrecedent === props.categorie) {
+    filtreSelectionne.value = 'all'; 
+    if (filtrePrecedent === 'all') {
       nextTick(() => {
         animerCartes();
         observerVideos();
@@ -340,10 +380,34 @@ watch(() => props.visible, (isVisible) => {
       });
     }
   } else {
-    // Pause all videos when Portfolio is closed/hidden
     const videos = gridRef.value?.querySelectorAll('video');
     videos?.forEach(v => v.pause());
     arreterObservationVideos();
+    
+    // Destruction immédiate et agressive du visualiseur Spline lors de la fermeture
+    try {
+      const viewer = splineViewerRef.value || document.querySelector('spline-viewer');
+      if (viewer) {
+        viewer.setAttribute('url', '');
+        if (viewer.shadowRoot) {
+          const canvas = viewer.shadowRoot.querySelector('canvas');
+          if (canvas) {
+            const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+            if (gl) {
+              gl.getExtension('WEBGL_lose_context')?.loseContext();
+            }
+            canvas.remove();
+          }
+        }
+        if (typeof viewer.dispose === 'function') {
+          try { viewer.dispose(); } catch (e) {}
+        }
+      }
+    } catch (e) {
+      console.warn("Erreur lors de la destruction de Spline:", e);
+    }
+    
+    showSpline.value = false;
   }
 });
 
@@ -435,7 +499,7 @@ const surScrollPortfolio = (e) => {
 };
 
 onMounted(() => {
-  filtreSelectionne.value = props.categorie || 'all';
+  filtreSelectionne.value = 'all';
 
   checkMobile();
   window.addEventListener('resize', checkMobile);
@@ -445,10 +509,7 @@ onMounted(() => {
   }
 
   if (!isMobile.value) {
-    // Lancer le chargement en arrière-plan après 3 secondes (temps mort)
-    prechargerTimer = setTimeout(() => {
-      chargerSplineRobot();
-    }, 3000);
+    chargerSplineRobot();
   }
 
   intervalHideLogo = setInterval(hideSplineLogo, 100);
@@ -478,6 +539,35 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', checkMobile);
   if (grilleSectionRef.value) {
     grilleSectionRef.value.removeEventListener('scroll', surScrollPortfolio);
+  }
+
+  // Destruction propre du visualiseur Spline pour éviter les fuites WebGL (ralentissement ventilateur PC)
+  try {
+    const viewer = splineViewerRef.value || document.querySelector('spline-viewer');
+    if (viewer) {
+      // Forcer le déchargement de la scène
+      viewer.setAttribute('url', '');
+      
+      // Tuer agressivement le contexte WebGL pour libérer le GPU instantanément
+      if (viewer.shadowRoot) {
+        const canvas = viewer.shadowRoot.querySelector('canvas');
+        if (canvas) {
+          const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+          if (gl) {
+            gl.getExtension('WEBGL_lose_context')?.loseContext();
+          }
+          // Supprimer physiquement le canvas pour empêcher toute boucle de rendu fantôme
+          canvas.remove();
+        }
+      }
+
+      if (typeof viewer.dispose === 'function') {
+        try { viewer.dispose(); } catch (e) {}
+      }
+      // Retiré viewer.remove() : Vue gère la suppression du DOM
+    }
+  } catch (e) {
+    console.warn("Erreur lors de la destruction de Spline:", e);
   }
 });
 </script>
@@ -750,21 +840,6 @@ background-color: rgba(217, 217, 217, 0.92);
 /* ─── FILTRE VERSION MOBILE ──────────────────────────────────────────────────── */
 .mobile-trier-select-conteneur {
   display: none;
-  margin-bottom: 30px;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  max-width: 320px;
-}
-
-.mobile-select .custom-select-trigger {
-  width: 100%;
-}
-
-.mobile-select .custom-select-panel {
-  bottom: auto;
-  top: calc(100% + 6px);
-  transform-origin: top center;
 }
 
 /* ─── MODALE DÉTAIL IMMERSIVE (LIGHTBOX) ──────────────────────────────────────── */
@@ -778,7 +853,7 @@ background-color: rgba(217, 217, 217, 0.92);
     width: 100vw;
     height: 100vh;
     overflow-y: auto;
-    padding: 110px 5vw 80px;
+    padding: 110px 5vw 150px;
   }
   
   .projets-grid {
@@ -787,11 +862,31 @@ background-color: rgba(217, 217, 217, 0.92);
   }
   
   .projets-visualisation-section {
-    display: none; /* Masquer la colonne Spline sur tablette/mobile */
+    display: none;
   }
   
   .mobile-trier-select-conteneur {
-    display: flex; /* Rendre le sélecteur visible au dessus de la grille */
+    display: flex;
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: calc(100vw - 4rem);
+    max-width: 450px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mobile-select .custom-select-trigger {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .mobile-select .custom-select-panel {
+    bottom: calc(100% + 6px);
+    top: auto;
+    transform-origin: bottom center;
   }
 }
 
@@ -803,7 +898,7 @@ background-color: rgba(217, 217, 217, 0.92);
   
   .projets-grille-section {
     padding-top: 100px;
+    padding-bottom: 140px;
   }
-  
 }
 </style>

@@ -601,6 +601,15 @@ const obtenirStyleBarre = (index) => {
   .projets-liste-scroll {
     padding-left: 5vw;
     padding-right: 10vw;
+    height: 60vh !important;
+  }
+
+  .projets-liste-interne {
+    height: 48vh !important;
+  }
+
+  .slider-barres-bas {
+    bottom: 1.8rem !important;
   }
 
   .projet-cadre {
@@ -614,7 +623,7 @@ const obtenirStyleBarre = (index) => {
 
   .projet-titre-haut,
   .projet-titre-bas {
-    font-size: clamp(2rem, 7vw, 4rem);
+    font-size: clamp(3.5rem, 14vw, 5.5rem) !important;
   }
 
   .bouton-explorer-projet {
@@ -636,11 +645,11 @@ const obtenirStyleBarre = (index) => {
   .projets-liste-scroll {
     padding-left: 4vw;
     padding-right: 8vw;
-    height: 70vh;
+    height: 58vh !important;
   }
 
   .projets-liste-interne {
-    height: 58vh;
+    height: 42vh !important;
     gap: 0.4rem;
   }
 
@@ -654,7 +663,12 @@ const obtenirStyleBarre = (index) => {
   }
 
   .slider-barres-bas {
-    bottom: 1.8rem;
+    bottom: 1.8rem !important;
+  }
+
+  .projet-titre-haut,
+  .projet-titre-bas {
+    font-size: clamp(3rem, 11vw, 5rem) !important;
   }
 }
 
@@ -725,27 +739,38 @@ const obtenirStyleBarre = (index) => {
 /* Responsive */
 @media (max-width: 1024px) {
   .projets-infos-bas {
-    left: 5vw;
-    right: 5vw;
-    bottom: 3.2rem;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 5.2rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.3rem !important;
   }
-  .categorie-label,
+  .categorie-label {
+    font-size: 1.2rem !important;
+  }
   .projets-pagination {
-    font-size: 0.95rem;
+    font-size: 1.1rem !important;
   }
 }
 
 @media (max-width: 768px) {
   .projets-infos-bas {
-    left: 4vw;
-    right: 4vw;
-    bottom: 2rem;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 5.2rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.25rem !important;
   }
   .categorie-label {
-    display: none; /* Masquer la catégorie sur petit écran pour éviter les chevauchements avec le slider */
+    display: block !important;
+    font-size: 1.1rem !important;
   }
   .projets-pagination {
-    font-size: 0.85rem;
+    font-size: 0.95rem !important;
   }
 }
 </style>

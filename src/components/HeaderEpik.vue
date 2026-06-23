@@ -2,7 +2,7 @@
   <header :class="['header-epik', `pos-${position}`, { 'has-gradient': gradient }]">
     <!-- Logo -->
     <div class="logo-conteneur" style="cursor: pointer;" @click="$emit('logo-click')">
-      <img src="/logo.svg" alt="Epik Brand Logo" class="logo-image" />
+      <img src="/logo.svg" alt="Epik Brand Logo" class="logo-image" fetchpriority="high" loading="eager" />
     </div>
 
     <!-- Navigation du milieu -->
@@ -207,10 +207,18 @@ defineExpose({
 /* responsive rule */
 @media (max-width: 768px) {
   .header-epik {
-    padding: 2rem 5%;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1.25rem;
+    padding: calc(1.5rem + env(safe-area-inset-top, 0px)) 5% 1rem 5% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1rem !important;
+  }
+
+  .logo-conteneur {
+    justify-content: center !important;
+    margin: 0 auto !important;
+    margin-top: 1rem !important;
   }
 
   .logo-image {
@@ -218,22 +226,38 @@ defineExpose({
   }
 
   .navigation-milieu {
-    position: relative;
-    left: auto;
-    transform: none;
-    justify-self: end;
+    position: relative !important;
+    left: auto !important;
+    transform: none !important;
+    margin-top: 0.2rem !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
   }
 
   .liens-navigation {
-    gap: 1.5rem;
+    gap: 2rem !important;
+    justify-content: center !important;
   }
 
   .lien-nav {
-    font-size: 1.1rem;
+    font-size: 1.1rem !important;
+  }
+
+  .bouton-offres {
+    font-size: 0.85rem !important;
+    padding: 0.5rem 1.1rem !important;
+    gap: 1rem !important;
+  }
+
+  .bouton-offres .plus-gauche,
+  .bouton-offres .plus-droit {
+    font-size: 1.1rem !important;
   }
 
   .controle-musique {
-    display: none;
+    display: none !important;
   }
 }
 </style>

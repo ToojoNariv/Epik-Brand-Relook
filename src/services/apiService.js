@@ -1,8 +1,7 @@
 import { ref, watch } from 'vue';
 import { langueActive } from '../i18n/index';
 
-// Lit l'URL de l'API depuis la variable d'environnement ou se rabat sur le port local 8080 par défaut
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8080' : 'https://epikbrand-backoffice.onrender.com');
 
 export const projects = ref([]);
 export const teamMembers = ref([]);
@@ -37,6 +36,20 @@ export async function fetchAllData() {
     // Remplir les données réactives s'ils sont valides
     projects.value = Array.isArray(projectsData) ? projectsData : [];
     teamMembers.value = Array.isArray(teamData) ? teamData : [];
+
+    // Précharger les images des projets discrètement en arrière-plan
+    // Cela permet d'avoir des images qui s'affichent instantanément dans le portfolio
+    if (projects.value.length > 0) {
+      setTimeout(() => {
+        projects.value.forEach(p => {
+          if (p.category !== 'video' && p.src) {
+            const img = new Image();
+            img.fetchPriority = 'low'; // Basse priorité pour ne pas bloquer le reste
+            img.src = p.src;
+          }
+        });
+      }, 500); // Léger délai pour ne pas concurrencer le rendu initial
+    }
   } catch (err) {
     console.warn("[API Service] Le serveur backend est hors-ligne. Affichage des données locales de secours. Détail :", err.message);
     error.value = err.message;

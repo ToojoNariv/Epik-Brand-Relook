@@ -171,22 +171,46 @@ onMounted(() => {
   display: block;
 }
 
+@media (max-width: 1024px) {
+  .conteneur-stats {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    padding: 0 4% 1.5rem 4% !important;
+  }
+  
+  .stats-grille {
+    max-width: 90% !important;
+    margin-bottom: 2vh !important;
+  }
+}
+
 @media (max-width: 768px) {
   .stats-grille {
-    flex-direction: column;
-    gap: 3.5rem;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    gap: 0.2rem !important;
+    max-width: 80% !important;
+    margin: 0 auto 1vh auto !important;
   }
   
   .stat-element {
-    width: 100%;
+    flex: 0 1 auto !important;
   }
   
   .stat-separateur {
-    display: none;
+    display: none !important;
   }
   
   .stat-valeur {
-    font-size: 3rem;
+    font-size: 1.3rem !important;
+    margin-bottom: 0.3rem !important;
+  }
+  
+  .stat-label {
+    font-size: 0.45rem !important;
+    letter-spacing: 0.08em !important;
   }
 }
 </style>

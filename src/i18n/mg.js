@@ -8,7 +8,9 @@ export const mg = {
     sendRequest: "Handefa ny fangatahana",
     errorRequired: "Ilaina ity sehatra ity",
     successMerci: "Misaotra betsaka!",
-    successDemande: "Voaray ny fangatahana!"
+    successDemande: "Voaray ny fangatahana!",
+    loaderWait: "Kely sisa",
+    errorSubmit: "Nisy fahadisoana nitranga tamin'ny fandefasana. Manandrama indray azafady."
   },
   menu: {
     expertises: "Fahaiza-manaonay",
@@ -136,5 +138,30 @@ export const mg = {
     graphique: "Graphic design",
     video: "Famokarana Horonantsary",
     web: "Tranonkala"
+  },
+  seo: {
+    title: {
+      home: "Epik Brand | Masoivoho Mpamorona eto Madagasikara - Sary, Horonan-tsary, Design & Tranonkala",
+      photo: "Fakana Sary Matihanina Studio | Epik Brand",
+      video: "Famokarana sy Fanitsiana Horonantsary | Epik Brand",
+      graphique: "Famolavolana Sary & Maha-izy Azy ara-Tsary | Epik Brand",
+      web: "Fampandrosoana Tranonkala & Tranonkala Mpamorona | Epik Brand",
+      portfolio: "Portfolio ny Tetikasa Mpamorona | Epik Brand",
+      offres: "Ny Tolotra sy ny Sarany | Epik Brand",
+      apropos: "Momban'ny Masoivoho | Epik Brand",
+      contact: "Mifandraisa amin'ny Masoivoho | Epik Brand"
+    },
+    description: {
+      home: "Mampifandray ny herin'ny paikady marika sy ny fientanentanana ara-tsary. Masoivoho mpamorona manam-pahaizana manokana amin'ny famolavolana marika, sary studio, famokarana horonantsary, design ary fampandrosoana tranonkala eto Antananarivo, Madagasikara.",
+      photo: "Serivisy fakana sary matihanina eto Madagasikara. Fakana sary studio, packshot vokatra, sary corporate ary fitarihana ara-javakanto mba hanatsarana ny endrika marikao.",
+      video: "Famokarana horonantsary dokam-barotra sy andrim-panjakana manara-penitra. Fisoratana senariô, fakana sary ary fanitsiana horonantsary mavitrika hisarihana ny sain'ny mpanjifanao.",
+      graphique: "Famoronana famantarana (logo), sata ara-tsary feno, endrika marika ary fitaovam-pifandraisana misy fiantraikany mba hametrahana ny maha-izy anao ara-tsary.",
+      web: "Famoronana tranonkala matihanina namboarina manokana, haingana ary optimized amin'ny SEO. Tolotra e-commerce sy fampirantiana interactive miavaka.",
+      portfolio: "Jereo ny portfolio-n'ny tetikasa mpamorona anay: zava-bita amin'ny fakana sary, horonantsary, famolavolana marika ary tranonkala novolavolain'ny Epik Brand.",
+      offres: "Jereo ireo tolotra manokana ho an'ny seraseran'ny marikao: sary matihanina, famokarana horonantsary Full HD, famolavolana famantarana ary famoronana tranonkala optimized.",
+      apropos: "Fantaro ny ekipan'ny masoivoho mpamorona Epik Brand ao Soavimasoandro, Antananarivo. Jereo ireo fitsipika fiasan-drizareo mifototra amin'ny fanoloran-tena sy ny fahombiazana.",
+      contact: "Andao hifanakalo hevitra momba ny tetikasanao: fanovana marika, fakana sary, famokarana horonantsary na famoronana tranonkala. Soraty izahay na mamandrika antso mba hanatanterahana ny hevitrao."
+    },
+    keywords: "Epik Brand, masoivoho mpamorona Madagasikara, rebranding, sary studio, fanitsiana horonantsary Antananarivo, design web, fampandrosoana tranonkala, maha-izy azy ara-tsary, fakana sary Madagasikara, famokarana audiovisual"
   }
 };

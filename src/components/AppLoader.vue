@@ -4,6 +4,7 @@
     <!-- Progress Bar Initiale -->
     <div class="progress-bar-container">
       <div class="progress-bar-fill"></div>
+      <div class="loader-wait-text">{{ t('common.loaderWait') }}</div>
     </div>
 
     <div class="colonnes-wrapper">
@@ -45,36 +46,31 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { gsap } from 'gsap';
+import { t } from '../i18n/index';
 
 const emit = defineEmits(['complete', 'reveal']);
 const loaderContainer = ref(null);
 
-// Images de la galerie
 const allImages = [
   'https://ik.imagekit.io/h5zy3jui5/Menu/A%20propos.jpg?updatedAt=1781276235566',
-  'https://ik.imagekit.io/h5zy3jui5/Contact/Contact%20Background.jpg?updatedAt=1781289122652',
+  'https://ik.imagekit.io/h5zy3jui5/Branding/LAROCHE/Charte%20graphique-06.jpg?updatedAt=1781426322794',
   'https://ik.imagekit.io/h5zy3jui5/Home%20photo/design.jpg?updatedAt=1781289704998',
-  '/images/Offre.jpg',
+  'https://ik.imagekit.io/h5zy3jui5/Branding/Miray/Miray%20charte%20graphique-09.jpg?updatedAt=1781517471686',
   'https://ik.imagekit.io/h5zy3jui5/Menu/Portfolio.jpg?updatedAt=1781288855163',
-  'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Web%20Background.jpg?updatedAt=1781274741057',
+  'https://ik.imagekit.io/h5zy3jui5/Branding/LAROCHE/Charte%20graphique-03.jpg?updatedAt=1781426323831',
   'https://ik.imagekit.io/h5zy3jui5/Home%20photo/design.jpg',
   'https://ik.imagekit.io/h5zy3jui5/Home%20photo/windows-w79mIrYKcK4-unsplash.jpg'
 ];
 
-// 3 colonnes, 4 photos par colonne pour un long défilement
 const colGauche = [allImages[0], allImages[1], allImages[2], allImages[3]];
-// L'image d'accueil (Hero) est forcée à l'index 1 (2ème position)
 const colCentre = [allImages[4], 'https://ik.imagekit.io/h5zy3jui5/Home%20photo/Photographie%20Background.jpg?updatedAt=1781288609519', allImages[5], allImages[6]];
 const colDroite = [allImages[7], allImages[0], allImages[1], allImages[2]];
 
 onMounted(() => {
-  // L'astuce ultime pour la fluidité totale : attendre que les images lourdes
-  // soient TOTALEMENT chargées et décodées en RAM avant de commencer l'animation.
   const images = document.querySelectorAll('.loader-container img');
   let loadedCount = 0;
   const totalImages = images.length;
 
-  // Initialiser la progress bar à 0%
   gsap.set('.progress-bar-fill', { scaleX: 0 });
 
   const startAnimation = () => {
@@ -306,6 +302,18 @@ onMounted(() => {
   background-color: #ffffff;
   transform-origin: left center;
   will-change: transform;
+}
+
+.loader-wait-text {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.77);
+  font-size: 0.8rem;
+  font-weight: 300;
+  white-space: nowrap;
+  font-family: var(--police-texte);
 }
 
 .colonnes-wrapper {

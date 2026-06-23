@@ -2,73 +2,95 @@
   <div class="expertises-section">
     <!-- Grille des expertises (Fidèle 100% à l'Aperçu) -->
     <div class="expertises-grille">
+      <template v-for="set in [0, 1, 2]" :key="set">
 
-      <!-- 1. Photographie -->
-      <div class="expertise-carte" id="carte-photo" @click="$emit('selectionner', 'photo')">
-        <div class="expertise-conteneur-image">
-          <!-- Ce wrapper sera animé par GSAP pour passer du plein écran à la taille carte -->
-          <div class="image-wrapper" id="photo-image-wrapper">
-            <img src="/images/Photographie Background.jpg" alt="Photographie Epik Brand" class="image-fond" />
-            <div class="image-overlay">
-              <h3 class="nom-expertise texte-titre">
-                <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.photo').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
-              </h3>
+        <!-- 1. Photographie -->
+        <div 
+          class="expertise-carte" 
+          :class="{ 'original-set': set === 1 }"
+          :id="set === 1 ? 'carte-photo' : undefined" 
+          @click="$emit('selectionner', { id: 'photo', set, element: $event.currentTarget })"
+        >
+          <div class="expertise-conteneur-image">
+            <!-- Ce wrapper sera animé par GSAP pour passer du plein écran à la taille carte -->
+            <div class="image-wrapper" :id="set === 1 ? 'photo-image-wrapper' : undefined">
+              <img src="/images/Photographie Background.jpg" alt="Photographie Epik Brand" class="image-fond" decoding="async" />
+              <div class="image-overlay">
+                <h3 class="nom-expertise texte-titre">
+                  <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.photo').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
+                </h3>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 2. Graphique Design -->
-      <div class="expertise-carte" id="carte-graphique" @click="$emit('selectionner', 'graphique')">
-        <div class="expertise-conteneur-image">
-          <div class="image-wrapper">
-            <img src="https://ik.imagekit.io/h5zy3jui5/Home%20photo/design.jpg" alt="Graphique design Epik Brand"
-              class="image-fond" />
-            <div class="image-overlay">
-              <h3 class="nom-expertise texte-titre">
-                <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.graphique').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
-              </h3>
+        <!-- 2. Graphique Design -->
+        <div 
+          class="expertise-carte" 
+          :class="{ 'original-set': set === 1 }"
+          :id="set === 1 ? 'carte-graphique' : undefined" 
+          @click="$emit('selectionner', { id: 'graphique', set, element: $event.currentTarget })"
+        >
+          <div class="expertise-conteneur-image">
+            <div class="image-wrapper">
+              <img src="https://ik.imagekit.io/h5zy3jui5/Home%20photo/design.jpg" alt="Graphique design Epik Brand"
+                class="image-fond" decoding="async" />
+              <div class="image-overlay">
+                <h3 class="nom-expertise texte-titre">
+                  <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.graphique').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
+                </h3>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 3. Montage Vidéo -->
-      <div class="expertise-carte" id="carte-video" @click="$emit('selectionner', 'video')">
-        <div class="expertise-conteneur-image">
-          <div class="image-wrapper">
-            <video 
-              src="/images/Background vidéo.mp4" 
-              autoplay 
-              loop 
-              muted 
-              playsinline 
-              class="image-fond"
-              style="width: 100%; height: 100%; object-fit: cover;"
-            ></video>
-            <div class="image-overlay">
-              <h3 class="nom-expertise texte-titre">
-                <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.video').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
-              </h3>
+        <!-- 3. Montage Vidéo -->
+        <div 
+          class="expertise-carte" 
+          :class="{ 'original-set': set === 1 }"
+          :id="set === 1 ? 'carte-video' : undefined" 
+          @click="$emit('selectionner', { id: 'video', set, element: $event.currentTarget })"
+        >
+          <div class="expertise-conteneur-image">
+            <div class="image-wrapper">
+              <video 
+                src="/images/Background vidéo.mp4" 
+                autoplay 
+                loop 
+                muted 
+                playsinline 
+                class="image-fond"
+                style="width: 100%; height: 100%; object-fit: cover;"
+              ></video>
+              <div class="image-overlay">
+                <h3 class="nom-expertise texte-titre">
+                  <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.video').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
+                </h3>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 4. Web -->
-      <div class="expertise-carte" id="carte-web" @click="$emit('selectionner', 'web')">
-        <div class="expertise-conteneur-image">
-          <div class="image-wrapper">
-            <img src="/images/Web Background.jpg" alt="Web Epik Brand" class="image-fond" />
-            <div class="image-overlay">
-              <h3 class="nom-expertise texte-titre">
-                <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.web').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
-              </h3>
+        <!-- 4. Web -->
+        <div 
+          class="expertise-carte" 
+          :class="{ 'original-set': set === 1 }"
+          :id="set === 1 ? 'carte-web' : undefined" 
+          @click="$emit('selectionner', { id: 'web', set, element: $event.currentTarget })"
+        >
+          <div class="expertise-conteneur-image">
+            <div class="image-wrapper">
+              <img src="/images/Web Background.jpg" alt="Web Epik Brand" class="image-fond" decoding="async" />
+              <div class="image-overlay">
+                <h3 class="nom-expertise texte-titre">
+                  <span class="lettre-titre-carte" v-for="(lettre, i) in t('expertises.web').split('')" :key="i">{{ lettre === ' ' ? '\u00A0' : lettre }}</span>
+                </h3>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
+      </template>
     </div>
   </div>
 </template>
@@ -177,21 +199,47 @@ import { t } from '../i18n/index';
 
 /* Version responsive pour tablettes et mobiles */
 @media (max-width: 1024px) {
+  .expertises-section {
+    height: 100vh;
+    padding: 0;
+  }
+
   .expertises-grille {
-    grid-template-columns: repeat(2, 1fr);
-    height: auto;
+    display: flex;
+    flex-direction: row;
+    width: max-content;
+    height: 55vh;
+    padding: 0 10vw;
     gap: 1.5rem;
+    /* Reset from grid configurations if any */
+    grid-template-columns: none !important;
+  }
+
+  .expertise-carte {
+    flex: 0 0 60vw;
+    aspect-ratio: auto;
+    height: 100%;
+    background: #000000;
   }
 
   .nom-expertise {
-    font-size: 1.8rem;
+    font-size: 1.9rem;
   }
 }
 
 @media (max-width: 768px) {
   .expertises-grille {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    height: 50vh;
+    padding: 0 12vw;
+    gap: 1rem;
+  }
+
+  .expertise-carte {
+    flex: 0 0 76vw;
+  }
+  
+  .nom-expertise {
+    font-size: 1.7rem;
   }
 }
 </style>

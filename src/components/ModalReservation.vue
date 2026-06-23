@@ -37,6 +37,9 @@
 
             <!-- Form Fields -->
             <form v-else @submit.prevent="envoyerReservation" class="reservation-form" novalidate>
+              <div style="display: none;" aria-hidden="true">
+                <input type="checkbox" name="botcheck" v-model="form.botcheck" tabindex="-1" autocomplete="off" />
+              </div>
               <div class="form-range">
                 <div class="form-groupe" :class="{ 'a-erreur': erreurs.nomClient }">
                   <label for="modal-nom">{{ t('modal.nom') }}</label>
@@ -133,6 +136,7 @@
 import { ref, computed, watch } from 'vue';
 import { playDefaultClick, playTypewriter } from '../services/audioService';
 import { t } from '../i18n/index';
+import { trackEvent } from '../services/analyticsService';
 
 const props = defineProps({
   ouvert: {
@@ -153,7 +157,8 @@ const form = ref({
   email: '',
   telephone: '',
   whatsapp: '',
-  description: ''
+  description: '',
+  botcheck: false
 });
 
 const erreurs = ref({
@@ -181,6 +186,7 @@ watch(() => props.ouvert, (newVal) => {
     form.value.telephone = '';
     form.value.whatsapp = '';
     form.value.description = '';
+    form.value.botcheck = false;
     erreurs.value = {
       nomProjet: '',
       nomClient: '',
@@ -245,15 +251,75 @@ const validerFormulaire = () => {
   return estValide;
 };
 
-const envoyerReservation = () => {
+const envoyerReservation = async () => {
   playDefaultClick();
   if (!validerFormulaire()) return;
   
+  // Anti-bot honeypot check
+  if (form.value.botcheck) {
+    // Silent success to trick bots
+    statutEnvoi.value = 'success';
+    return;
+  }
+  
   statutEnvoi.value = 'sending';
   
-  setTimeout(() => {
-    statutEnvoi.value = 'success';
-  }, 1500);
+  // Capture local copy of form details for analytics tracking before reset
+  const submittedData = {
+    nomClient: form.value.nomClient,
+    email: form.value.email,
+    nomProjet: form.value.nomProjet,
+    telephone: form.value.telephone,
+    whatsapp: form.value.whatsapp,
+    description: form.value.description,
+    offreId: props.offre?.id || 'personalise',
+    offreTitre: props.offre?.titre || 'Projet personnalisé'
+  };
+  
+  try {
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
+        subject: `Nouvelle réservation d'offre (${submittedData.offreTitre}) - ${submittedData.nomClient}`,
+        from_name: submittedData.nomClient,
+        replyto: submittedData.email,
+        botcheck: form.value.botcheck,
+        "Nom du Client": submittedData.nomClient,
+        "Email de Contact": submittedData.email,
+        "Numéro de Téléphone": submittedData.telephone,
+        "Contact WhatsApp": submittedData.whatsapp,
+        "Nom du Projet": submittedData.nomProjet,
+        "Offre Sélectionnée": submittedData.offreTitre,
+        "Description du Projet": submittedData.description
+      })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      // Track conversion event in Google Analytics
+      trackEvent('booking_form_submit', {
+        offre_id: submittedData.offreId,
+        offre_name: submittedData.offreTitre,
+        project_name: submittedData.nomProjet,
+        user_name: submittedData.nomClient,
+        user_email: submittedData.email
+      });
+
+      statutEnvoi.value = 'success';
+    } else {
+      throw new Error(result.message || 'Erreur lors du traitement Web3Forms.');
+    }
+  } catch (error) {
+    console.error('Erreur d\'envoi:', error);
+    alert(t('common.errorSubmit'));
+    statutEnvoi.value = 'idle';
+  }
 };
 </script>
 
@@ -588,6 +654,17 @@ const envoyerReservation = () => {
   }
   .bouton-fermer-modal {
     top: -3.5rem;
+  }
+  .form-bouton-wrap {
+    display: flex;
+    justify-content: center;
+  }
+  .bouton-envoyer-modal,
+  .bouton-retour-success {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+    justify-content: space-between;
   }
 }
 </style>

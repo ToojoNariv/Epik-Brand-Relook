@@ -7,6 +7,12 @@ const dictionaries = { fr, en, mg };
 
 const getInitialLang = () => {
   if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const langParam = urlParams.get('lang');
+    if (langParam && dictionaries[langParam]) {
+      localStorage.setItem('langueActive', langParam);
+      return langParam;
+    }
     const saved = localStorage.getItem('langueActive');
     if (saved && dictionaries[saved]) {
       return saved;
@@ -22,6 +28,9 @@ export const setLangue = (langCode) => {
     langueActive.value = langCode;
     if (typeof window !== 'undefined') {
       localStorage.setItem('langueActive', langCode);
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', langCode);
+      window.history.replaceState({}, '', url.toString());
     }
   }
 };

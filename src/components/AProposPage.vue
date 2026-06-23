@@ -2,7 +2,7 @@
   <div class="apropos-page" ref="pageRef" aria-hidden="true">
 
     <!-- ─── HEADER ─────────────────────────────────────────── -->
-    <HeaderEpik position="fixed" @logo-click="fermer" @expertises-click="fermer" @menu-click="ouvrirMenu"
+    <HeaderEpik position="fixed" :gradient="true" @logo-click="fermer" @expertises-click="fermer" @menu-click="ouvrirMenu"
       class="headeraboutpage" />
 
     <!-- ─── SCROLLABLE WRAPPER ─────────────────────────────── -->
@@ -135,24 +135,6 @@ const equipe = computed(() => {
   if (teamMembers.value && teamMembers.value.length > 0) {
     return teamMembers.value;
   }
-  
-  // Local fallback
-  return [
-    {
-      prenom: 'Nantenaina',
-      nom: 'RANDRIA',
-      role: t('apropos.ceo'),
-      email: 'nantenaina@gmail.com',
-      photo: '/images/Nantenaina.png'
-    },
-    {
-      prenom: 'Miora Oliva',
-      nom: 'RAHOLIARIVAO',
-      role: t('apropos.pm'),
-      email: 'miora@gmail.com',
-      photo: '/images/Miora.png'
-    }
-  ];
 });
 
 // ── Animations ─────────────────────────────────────────────────
@@ -236,14 +218,25 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+  height: 100dvh;
   z-index: 9000;
-
   background-color: #000000;
   color: #fff;
   font-family: 'Poppins', sans-serif;
   opacity: 0;
   visibility: hidden;
   overflow: hidden;
+}
+
+.headeraboutpage {
+  background: transparent !important;
+}
+
+@media (max-width: 1024px) {
+  .headeraboutpage {
+    background: linear-gradient(180deg, #000 72%, rgba(0, 0, 0, 0)) !important;
+  }
 }
 
 .ap-scroll {
@@ -636,7 +629,7 @@ onBeforeUnmount(() => {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
     min-height: unset;
-    padding-top: 2rem;
+    padding-top: 13rem;
   }
 
   .ap-hero-bar {
@@ -644,7 +637,7 @@ onBeforeUnmount(() => {
   }
 
   .ap-hero-gauche {
-    padding: 3rem 4vw;
+    padding: 1rem 4vw 2rem;
     justify-content: center;
     text-align: center;
   }
@@ -653,12 +646,21 @@ onBeforeUnmount(() => {
     align-items: center;
   }
 
+  .ap-hero-l {
+    font-size: 3rem;
+  }
+
   .ap-hero-agence {
+    font-size: 3rem;
     transform: none;
   }
 
   .ap-hero-centre {
     min-height: 55vw;
+  }
+
+  .ap-hero-gif {
+    margin-top: 0vh;
   }
 
   .ap-hero-droite {
@@ -667,8 +669,30 @@ onBeforeUnmount(() => {
     text-align: center;
   }
 
+  .ap-hero-slogan {
+    font-size: 1.6rem;
+  }
+
   .slogan-milieu {
-    transform: none;
+    transform: rotate(-2.5deg);
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    margin: 1.2rem 0;
+  }
+
+  .slogan-milieu::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 120%;
+    background: #000000;
+    z-index: -1;
   }
 
   .ap-principes {
@@ -676,11 +700,11 @@ onBeforeUnmount(() => {
   }
 
   .ap-principes-header {
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .ap-principes-titre {
-    text-align: center;
+    text-align: left;
     max-width: 100%;
   }
 
@@ -691,12 +715,13 @@ onBeforeUnmount(() => {
 
   .ap-equipe {
     grid-template-columns: 1fr;
-    padding: 4rem 4vw 6rem;
+    padding: 4rem 0 6rem;
   }
 
   .ap-equipe-gauche {
     position: relative;
     top: auto;
+    padding: 0 4vw;
   }
 
   .ap-equipe-titre {
@@ -715,6 +740,8 @@ onBeforeUnmount(() => {
 
   .ap-membre-nom-bloc {
     width: 60%;
+    left: 20%;
+    transform: none;
     bottom: 10%;
   }
 }
@@ -727,7 +754,9 @@ onBeforeUnmount(() => {
 
   .ap-membre-nom-bloc {
     width: 80%;
-    bottom: 8%;
+    left: 12%;
+    transform: none;
+    bottom: 10%;
   }
 }
 </style>

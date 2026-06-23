@@ -14,7 +14,7 @@
       <div class="contact-gauche">
         <div class="titres-wrap">
           <h1 class="contact-titre animate-item">{{ t('contact.title') }}</h1>
-          <a href="mailto:hello@epicbrand.com" class="contact-email animate-item">hello@epicbrand.com</a>
+          <a href="hello@epik-brand.com" class="contact-email animate-item">hello@epik-brand.com</a>
         </div>
       </div>
 
@@ -44,6 +44,9 @@
 
             <!-- Formulaire -->
             <form v-else @submit.prevent="envoyerFormulaire" class="contact-form" novalidate>
+              <div style="display: none;" aria-hidden="true">
+                <input type="checkbox" name="botcheck" v-model="form.botcheck" tabindex="-1" autocomplete="off" />
+              </div>
               <div class="form-range animate-item">
                 <div class="form-groupe" :class="{ 'a-erreur': erreurs.nom }">
                   <label for="nom">{{ t('contact.nom') }}</label>
@@ -120,6 +123,7 @@ import { gsap } from 'gsap';
 import HeaderEpik from './HeaderEpik.vue';
 import { playTypewriter } from '../services/audioService';
 import { t } from '../i18n/index';
+import { trackEvent } from '../services/analyticsService';
 
 // ── Props & Emits ─────────────────────────────────────────────
 const props = defineProps({
@@ -142,7 +146,8 @@ const form = ref({
   nom: '',
   prenom: '',
   email: '',
-  message: ''
+  message: '',
+  botcheck: false
 });
 
 const erreurs = ref({
@@ -195,25 +200,84 @@ const validerFormulaire = () => {
   return estValide;
 };
 
-const envoyerFormulaire = () => {
+const envoyerFormulaire = async () => {
   if (!validerFormulaire()) return;
   
-  statutEnvoi.value = 'sending';
-  
-  // Simulation de l'envoi API
-  setTimeout(() => {
+  // Anti-bot honeypot check
+  if (form.value.botcheck) {
+    // Silent success to trick bots
     statutEnvoi.value = 'success';
-    // Réinitialisation du formulaire
     form.value = {
       nom: '',
       prenom: '',
       email: '',
-      message: ''
+      message: '',
+      botcheck: false
     };
     if (textareaRef.value) {
       textareaRef.value.style.height = 'auto';
     }
-  }, 1500);
+    return;
+  }
+  
+  statutEnvoi.value = 'sending';
+  
+  // Capture local copy of form details for analytics tracking before reset
+  const submittedData = {
+    nom: form.value.nom,
+    prenom: form.value.prenom,
+    email: form.value.email,
+    message: form.value.message
+  };
+  
+  try {
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
+        subject: `Nouveau message de contact - ${submittedData.prenom} ${submittedData.nom}`,
+        from_name: `${submittedData.prenom} ${submittedData.nom}`,
+        replyto: submittedData.email,
+        botcheck: form.value.botcheck,
+        "Nom Complet": `${submittedData.prenom} ${submittedData.nom}`,
+        "Email de Contact": submittedData.email,
+        "Message": submittedData.message
+      })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      // Track conversion event in Google Analytics
+      trackEvent('contact_form_submit', {
+        user_name: `${submittedData.prenom} ${submittedData.nom}`,
+        user_email: submittedData.email
+      });
+
+      statutEnvoi.value = 'success';
+      // Réinitialisation du formulaire
+      form.value = {
+        nom: '',
+        prenom: '',
+        email: '',
+        message: '',
+        botcheck: false
+      };
+      if (textareaRef.value) {
+        textareaRef.value.style.height = 'auto';
+      }
+    } else {
+      throw new Error(result.message || 'Erreur lors du traitement Web3Forms.');
+    }
+  } catch (error) {
+    console.error('Erreur d\'envoi:', error);
+    alert(t('common.errorSubmit'));
+    statutEnvoi.value = 'idle';
+  }
 };
 
 const reinitialiserStatut = () => {
@@ -328,6 +392,8 @@ onBeforeUnmount(() => {
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+  height: 100dvh;
   z-index: 9000;
   overflow-y: auto;
   overflow-x: hidden;
@@ -675,6 +741,12 @@ display: inline-block;
     width: 100%;
     max-width: 320px;
     margin: 0 auto;
+    justify-content: space-between;
+  }
+
+  .form-bouton-wrap {
+    display: flex;
+    justify-content: center;
   }
 
   .contact-success-card {
@@ -691,6 +763,7 @@ display: inline-block;
     width: calc(100vw - 2.5rem);
     margin-top: 1rem;
     margin-bottom: 2.5rem;
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .contact-titre {

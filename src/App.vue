@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import AppLoader from './components/AppLoader.vue'
 import PageAccueil from './components/PageAccueil.vue'
 import { fetchAllData } from './services/apiService'
@@ -15,8 +15,23 @@ const onLoaderComplete = () => {
   loaderActif.value = false
 }
 
+const updateVh = () => {
+  if (typeof window !== 'undefined') {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+}
+
 onMounted(() => {
   fetchAllData()
+  updateVh()
+  window.addEventListener('resize', updateVh)
+  window.addEventListener('orientationchange', updateVh)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateVh)
+  window.removeEventListener('orientationchange', updateVh)
 })
 </script>
 
@@ -26,5 +41,4 @@ onMounted(() => {
 </template>
 
 <style>
-/* Les styles globaux sont déjà dans style.css */
 </style>

@@ -33,6 +33,11 @@
           </li>
         </ul>
       </nav>
+
+      <!-- Contrôle Musique (uniquement mobile/visible en bas) -->
+      <div class="menu-musique-mobile" ref="musiqueMobileRef">
+        <LecteurMusique />
+      </div>
     </div>
 
     <!-- Zone d'images et arrière-plan droit -->
@@ -60,6 +65,7 @@ import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { gsap } from 'gsap';
 import { playShowingCard, playHoverMenu } from '../services/audioService';
 import { langueActive, setLangue, t } from '../i18n/index';
+import LecteurMusique from './LecteurMusique.vue';
 
 const props = defineProps({
   ouvert: {
@@ -84,6 +90,7 @@ const imageWrapper = ref(null);
 const overlayRoot = ref(null);
 const languesRef = ref(null);
 const liensListeRef = ref(null);
+const musiqueMobileRef = ref(null);
 
 // --- Langues ---
 const langues = [
@@ -149,6 +156,7 @@ const animerOuverture = () => {
   gsap.set(espaceDroit.value, { opacity: 0 });
   if (langBtns.length > 0) gsap.set(langBtns, { opacity: 0, y: -15 });
   if (lienItems.length > 0) gsap.set(lienItems, { opacity: 0, x: -30 });
+  if (musiqueMobileRef.value) gsap.set(musiqueMobileRef.value, { opacity: 0, y: 15 });
 
   tlMenuActif = gsap.timeline();
 
@@ -187,6 +195,16 @@ const animerOuverture = () => {
       duration: 0.6,
       ease: 'power3.out'
     }, 0.2);
+  }
+
+  // 5. Apparition du contrôle musique mobile
+  if (musiqueMobileRef.value) {
+    tlMenuActif.to(musiqueMobileRef.value, {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      ease: 'power2.out'
+    }, 0.5);
   }
 
   estOuvert = true;
@@ -267,6 +285,16 @@ const animerFermeture = () => {
     duration: 0.65,
     ease: 'power3.inOut'
   }, 0.1);
+
+  // 6. Contrôle musique mobile disparaît
+  if (musiqueMobileRef.value) {
+    tlMenuActif.to(musiqueMobileRef.value, {
+      opacity: 0,
+      y: 15,
+      duration: 0.3,
+      ease: 'power2.in'
+    }, 0);
+  }
 };
 
 // --- Watcher principal sur props.ouvert ---
@@ -406,6 +434,8 @@ const clicLien = (ancrage) => {
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+  height: 100dvh;
   display: flex;
   z-index: 10000;
   overflow: hidden;
@@ -425,7 +455,7 @@ const clicLien = (ancrage) => {
   color: #050505;
   display: flex;
   flex-direction: column;
-  padding: 3rem 4vw 4% 5vw;
+  padding: calc(3rem + env(safe-area-inset-top, 0px)) 4vw calc(4% + env(safe-area-inset-bottom, 0px)) 5vw;
   z-index: 10002;
   will-change: transform;
   /* Départ hors-écran (GSAP démarre depuis ici) */
@@ -553,7 +583,6 @@ const clicLien = (ancrage) => {
   will-change: transform, opacity;
 }
 
-/* Fond sombre transparent pour contraster la sidebar */
 .menu-fond-sombre {
   position: absolute;
   inset: 0;
@@ -563,32 +592,78 @@ const clicLien = (ancrage) => {
   width: 100%;
   height: 100%;
 }
+.menu-musique-mobile {
+  display: none;
+}
 
 /* Règle adaptative pour tablettes et mobiles */
 @media (max-width: 1024px) {
   .menu-sidebar-gauche {
-    width: 100vw;
+    width: 75vw;
     padding: 3rem 1.5rem 4%;
   }
 
   .menu-espace-droit {
-    display: none;
+    display: block;
+    left: 75vw;
+    width: 25vw;
+  }
+
+  .menu-image-reveal-wrapper {
+    display: none !important;
   }
 
   .menu-lien-ancre {
-    font-size: 2.5rem;
+    font-size: 3.2rem;
   }
 }
 
 @media (max-width: 768px) {
+  .menu-sidebar-gauche {
+    width: 75vw;
+    padding: calc(3rem + env(safe-area-inset-top, 0px)) 1.5rem calc(4% + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .menu-espace-droit {
+    left: 75vw;
+    width: 25vw;
+  }
+
   .menu-lien-ancre {
-    font-size: 2.2rem;
+    font-size: 3rem;
+  }
+
+  .menu-musique-mobile {
+    display: block;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    padding-left: 1rem;
+  }
+  .menu-musique-mobile :deep(.bouton-musique) {
+    color: #050505 !important;
+    opacity: 0.65;
+    margin-right: 0;
+    padding-left: 0;
+    font-size: 1.4rem;
+  }
+  .menu-musique-mobile :deep(.bouton-musique.actif) {
+    opacity: 1;
   }
 }
 
 @media (max-width: 480px) {
+  .menu-sidebar-gauche {
+    width: 75vw;
+    padding: 3rem 1.2rem 4%;
+  }
+
+  .menu-espace-droit {
+    left: 75vw;
+    width: 25vw;
+  }
+
   .menu-lien-ancre {
-    font-size: 1.8rem;
+    font-size: 2.8rem;
   }
 }
 </style>

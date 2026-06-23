@@ -210,6 +210,7 @@ onBeforeUnmount(() => {
   inset: 0;
   z-index: 9000;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-y: auto;
   background: #000;
   color: #fff;
@@ -219,7 +220,19 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-
+@media (min-width: 1025px) {
+  .offres-page {
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+  }
+  .offres-contenu {
+    margin: auto auto !important;
+    padding-bottom: 0 !important;
+  }
+}
 
 .offres-contenu {
   display: grid;
