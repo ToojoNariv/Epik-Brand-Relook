@@ -66,6 +66,7 @@ import { gsap } from 'gsap';
 import { playShowingCard, playHoverMenu } from '../services/audioService';
 import { langueActive, setLangue, t } from '../i18n/index';
 import LecteurMusique from './LecteurMusique.vue';
+import { trackEvent } from '../services/analyticsService';
 
 const props = defineProps({
   ouvert: {
@@ -98,7 +99,10 @@ const langues = [
   { code: 'en', nom: 'ENGLISH' },
   { code: 'mg', nom: 'MALAGASY' }
 ];
-const changerLangue = (code) => { setLangue(code); };
+const changerLangue = (code) => {
+  setLangue(code);
+  trackEvent('change_language', { language: code });
+};
 
 // --- Éléments du menu ---
 const menuItems = [

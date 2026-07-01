@@ -196,6 +196,12 @@ watch(() => props.ouvert, (newVal) => {
       description: ''
     };
     statutEnvoi.value = 'idle';
+
+    // Track modal open event
+    trackEvent('booking_form_open', {
+      offre_id: props.offre?.id || 'personalise',
+      offre_name: props.offre?.titre || 'Projet personnalisé'
+    });
   }
 });
 
@@ -306,9 +312,7 @@ const envoyerReservation = async () => {
       trackEvent('booking_form_submit', {
         offre_id: submittedData.offreId,
         offre_name: submittedData.offreTitre,
-        project_name: submittedData.nomProjet,
-        user_name: submittedData.nomClient,
-        user_email: submittedData.email
+        project_name: submittedData.nomProjet
       });
 
       statutEnvoi.value = 'success';

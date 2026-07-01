@@ -11,15 +11,24 @@
           @click="ouvrirDetail(projet)"
         >
           <div class="projet-media-wrapper">
-            <video 
-              v-if="projet.mediaType === 'video'" 
-              :src="projet.src" 
-              autoplay 
-              loop 
-              muted 
-              playsinline 
-              class="projet-media"
-            ></video>
+            <template v-if="projet.mediaType === 'video' || isVideo(projet.src)">
+              <video 
+                v-if="isDirectVideo(projet.src)" 
+                :src="getPreviewVideoUrl(projet.src)" 
+                autoplay 
+                loop 
+                muted 
+                playsinline 
+                class="projet-media"
+              ></video>
+              <iframe 
+                v-else 
+                :src="getEmbedUrl(projet.src)" 
+                :class="['projet-media iframe-media', { 'youtube-iframe-zoom': isYoutubeVideo(projet.src) }]"
+                frameborder="0" 
+                allow="autoplay; fullscreen; picture-in-picture" 
+                allowfullscreen></iframe>
+            </template>
             <img 
               v-else 
               :src="projet.src" 
@@ -123,7 +132,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'open-detail']);
 // ─── DONNÉES DES PROJETS ─────────────────────────────────────────────────────
-import { projects } from '../services/apiService';
+import { projects, isDirectVideo, isVideo, isYoutubeVideo, getYoutubeThumbnail, getEmbedUrl, getPreviewVideoUrl } from '../services/apiService';
 
 const projetsParExpertise = computed(() => {
   return {
@@ -648,6 +657,17 @@ onBeforeUnmount(() => {
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
   user-select: none;
+}
+
+.iframe-media {
+  border: none;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
+.youtube-iframe-zoom {
+  transform: scale(1.85) !important; /* Zoom important pour cacher les bandes noires et l'UI YouTube */
 }
 
 .projet-overlay-shadow {

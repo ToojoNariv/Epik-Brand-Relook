@@ -31,13 +31,26 @@
           :class="['track-miniature-item', { 'actif': activeMediaIndex === index }]"
           @click="scrollerVersMedia(index)"
         >
-          <video 
-            v-if="media.type === 'video'" 
-            :src="media.src" 
-            muted 
-            class="miniature-img"
-            draggable="false"
-          ></video>
+          <template v-if="media.type === 'video' || isVideo(media.src)">
+            <video 
+              v-if="isDirectVideo(media.src)" 
+              :src="media.src" 
+              muted 
+              class="miniature-img"
+              draggable="false"
+            ></video>
+            <img 
+              v-else-if="getYoutubeThumbnail(media.src)" 
+              :src="getYoutubeThumbnail(media.src)" 
+              class="miniature-img" 
+              draggable="false"
+            />
+            <div v-else class="miniature-img placeholder-video-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="video-svg-icon">
+                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+              </svg>
+            </div>
+          </template>
           <img 
             v-else 
             :src="media.src" 
@@ -56,15 +69,24 @@
       
       <section class="hero-section" id="media-0" ref="heroRef">
         <div class="hero-media-wrapper">
-          <video 
-            v-if="projet.mediaType === 'video'" 
-            :src="projet.src" 
-            autoplay 
-            loop 
-            muted 
-            playsinline 
-            class="hero-media"
-          ></video>
+          <template v-if="projet.mediaType === 'video' || isVideo(projet.src)">
+            <video 
+              v-if="isDirectVideo(projet.src)" 
+              :src="getPreviewVideoUrl(projet.src)" 
+              autoplay 
+              loop 
+              muted 
+              playsinline 
+              class="hero-media"
+            ></video>
+            <iframe 
+              v-else 
+              :src="getEmbedUrl(projet.src)" 
+              :class="['hero-media iframe-media', { 'youtube-iframe-zoom': isYoutubeVideo(projet.src) }]"
+              frameborder="0" 
+              allow="autoplay; fullscreen; picture-in-picture" 
+              allowfullscreen></iframe>
+          </template>
           <img 
             v-else 
             :src="projet.src" 
@@ -98,61 +120,73 @@
             class="galerie-item-wrapper"
           >
             <!-- Wrapper pour le lecteur vidéo personnalisé -->
-            <div v-if="media.type === 'video'" class="custom-video-player">
-              <video 
-                :src="media.src" 
-                autoplay 
-                loop 
-                :muted="isMuted(index + 1)" 
-                playsinline 
-                class="galerie-media"
-                :ref="el => setVideoRef(index + 1, el)"
-                @timeupdate="gererTimeUpdate(index + 1, $event)"
-                @loadedmetadata="gererLoadedMetadata(index + 1, $event)"
-              ></video>
-              
-              <!-- Barre de contrôle personnalisée -->
-              <div 
-                class="video-controles-overlay"
-                :class="{ 'visible-scrubbing': estScrubbing && indexScrubbingActif === index + 1 }"
-              >
-                <!-- Bouton Lecture/Pause -->
-                <button type="button" class="btn-controle" @click="togglePlay(index + 1)">
-                  <svg v-if="isPlaying(index + 1)" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                  </svg>
-                  <svg v-else viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </button>
+            <!-- Wrapper pour le lecteur vidéo personnalisé ou IFrame -->
+            <template v-if="media.type === 'video' || isVideo(media.src)">
+              <div v-if="isDirectVideo(media.src)" class="custom-video-player">
+                <video 
+                  :src="media.src" 
+                  autoplay 
+                  loop 
+                  :muted="isMuted(index + 1)" 
+                  playsinline 
+                  class="galerie-media"
+                  :ref="el => setVideoRef(index + 1, el)"
+                  @timeupdate="gererTimeUpdate(index + 1, $event)"
+                  @loadedmetadata="gererLoadedMetadata(index + 1, $event)"
+                ></video>
                 
-                <!-- Barre de progression de la vidéo (Scrubber) -->
+                <!-- Barre de contrôle personnalisée -->
                 <div 
-                  class="barre-temps-conteneur" 
-                  @mousedown="commencerScrub(index + 1, $event)"
-                  @touchstart="commencerScrub(index + 1, $event)"
+                  class="video-controles-overlay"
+                  :class="{ 'visible-scrubbing': estScrubbing && indexScrubbingActif === index + 1 }"
                 >
-                  <div class="barre-temps-fond"></div>
-                  <div class="barre-temps-progres" :style="{ width: getProgresPct(index + 1) + '%' }"></div>
-                  <div class="barre-temps-curseur" :style="{ left: getProgresPct(index + 1) + '%' }"></div>
-                </div>
-                
-                <!-- Affichage du temps de lecture -->
-                <span class="temps-affichage">
-                  {{ formaterTemps(getCurrentTime(index + 1)) }} / {{ formaterTemps(getDuration(index + 1)) }}
-                </span>
+                  <!-- Bouton Lecture/Pause -->
+                  <button type="button" class="btn-controle" @click="togglePlay(index + 1)">
+                    <svg v-if="isPlaying(index + 1)" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </button>
+                  
+                  <!-- Barre de progression de la vidéo (Scrubber) -->
+                  <div 
+                    class="barre-temps-conteneur" 
+                    @mousedown="commencerScrub(index + 1, $event)"
+                    @touchstart="commencerScrub(index + 1, $event)"
+                  >
+                    <div class="barre-temps-fond"></div>
+                    <div class="barre-temps-progres" :style="{ width: getProgresPct(index + 1) + '%' }"></div>
+                    <div class="barre-temps-curseur" :style="{ left: getProgresPct(index + 1) + '%' }"></div>
+                  </div>
+                  
+                  <!-- Affichage du temps de lecture -->
+                  <span class="temps-affichage">
+                    {{ formaterTemps(getCurrentTime(index + 1)) }} / {{ formaterTemps(getDuration(index + 1)) }}
+                  </span>
 
-                <!-- Bouton Mute/Unmute -->
-                <button type="button" class="btn-controle" @click="toggleMute(index + 1)">
-                  <svg v-if="isMuted(index + 1)" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-                  </svg>
-                  <svg v-else viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                  </svg>
-                </button>
+                  <!-- Bouton Mute/Unmute -->
+                  <button type="button" class="btn-controle" @click="toggleMute(index + 1)">
+                    <svg v-if="isMuted(index + 1)" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
-            </div>
+              <div v-else class="custom-video-player iframe-player-container">
+                <iframe 
+                  :src="getEmbedUrlForGallery(media.src)" 
+                  class="galerie-media iframe-media" 
+                  frameborder="0" 
+                  allow="autoplay; fullscreen; picture-in-picture" 
+                  allowfullscreen
+                  style="width: 100%; aspect-ratio: 16/9; max-height: 80vh; border: none; display: block;"></iframe>
+              </div>
+            </template>
             <img 
               v-else 
               :src="media.src" 
@@ -173,6 +207,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { gsap } from 'gsap';
 import { estEnLecture, playDefaultClick, playScrollTick, playCursorWithTextClick } from '../services/audioService';
 import { t } from '../i18n/index';
+import { isDirectVideo, isVideo, isYoutubeVideo, getEmbedUrl, getEmbedUrlForGallery, getYoutubeThumbnail, getPreviewVideoUrl } from '../services/apiService';
 
 const props = defineProps({
   projet: {
@@ -197,9 +232,30 @@ const listeMediasComplete = computed(() => {
     src: props.projet.src
   };
 
-  // Filtrer la galerie pour enlever tout doublon avec l'image de couverture
   const galleryItems = props.projet.galerie || [];
-  const filteredGallery = galleryItems.filter(item => item.src !== props.projet.src);
+  
+  // Construire la galerie filtrée : on garde toutes les images/vidéos sauf l'image de couverture si c'est une simple image.
+  // Si la couverture est une vidéo, on la veut ABSOLUMENT dans la galerie pour pouvoir la lire (car le hero ne fait que la jouer en fond ou afficher une miniature).
+  const filteredGallery = [];
+  
+  const isCoverVideo = coverItem.type === 'video' || isVideo(coverItem.src);
+  
+  if (isCoverVideo) {
+    const alreadyInGallery = galleryItems.some(i => i.src === coverItem.src);
+    if (!alreadyInGallery) {
+      filteredGallery.push(coverItem);
+    }
+  }
+
+  galleryItems.forEach(item => {
+    if (item.src === coverItem.src) {
+      if (isCoverVideo) {
+        filteredGallery.push(item);
+      }
+    } else {
+      filteredGallery.push(item);
+    }
+  });
 
   return [coverItem, ...filteredGallery];
 });
@@ -808,6 +864,38 @@ onBeforeUnmount(() => {
   display: block;
   pointer-events: none;
   -webkit-user-drag: none;
+}
+
+.placeholder-video-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #111;
+  width: 100%;
+  height: 100%;
+}
+
+.video-svg-icon {
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.iframe-player-container {
+  background-color: #000;
+  width: 72vw;
+  height: auto;
+  aspect-ratio: 16/9;
+}
+
+.iframe-media {
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+.youtube-iframe-zoom {
+  transform: scale(1.85) !important;
 }
 
 .miniature-repere-progres {

@@ -253,10 +253,7 @@ const envoyerFormulaire = async () => {
 
     if (response.ok && result.success) {
       // Track conversion event in Google Analytics
-      trackEvent('contact_form_submit', {
-        user_name: `${submittedData.prenom} ${submittedData.nom}`,
-        user_email: submittedData.email
-      });
+      trackEvent('contact_form_submit');
 
       statutEnvoi.value = 'success';
       // Réinitialisation du formulaire

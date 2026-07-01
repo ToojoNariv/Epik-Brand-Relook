@@ -1846,6 +1846,13 @@ const declencherMiseAJourSEO = () => {
   
   if (stateObj.projetActifDetail) {
     path = `/portfolio/projet/${stateObj.projetActifDetail.id || 'detail'}`;
+    trackEvent('view_project_detail', {
+      project_id: stateObj.projetActifDetail.id,
+      project_title: Array.isArray(stateObj.projetActifDetail.titre) 
+        ? stateObj.projetActifDetail.titre.join(' ') 
+        : stateObj.projetActifDetail.titre,
+      project_category: stateObj.projetActifDetail.category || 'unknown'
+    });
   } else if (stateObj.contactOuvert) {
     path = '/contact';
   } else if (stateObj.aproposOuvert) {

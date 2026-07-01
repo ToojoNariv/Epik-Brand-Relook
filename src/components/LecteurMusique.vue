@@ -1,6 +1,6 @@
 <template>
   <button 
-    @click="basculerMusique" 
+    @click="surClicMusique" 
     class="bouton-musique"
     :class="{ 'actif': estEnLecture }"
     aria-label="Contrôle de la musique d'ambiance"
@@ -20,6 +20,12 @@
 <script setup>
 import { estEnLecture, basculerMusique } from '../services/audioService';
 import { t } from '../i18n/index';
+import { trackEvent } from '../services/analyticsService';
+
+const surClicMusique = () => {
+  basculerMusique();
+  trackEvent('toggle_music', { state: estEnLecture.value ? 'on' : 'off' });
+};
 </script>
 
 <style scoped>
