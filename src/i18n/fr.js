@@ -10,7 +10,8 @@ export const fr = {
     successMerci: "Merci !",
     successDemande: "Demande reçue !",
     loaderWait: "Patientez un peu durant ce chargement unique",
-    errorSubmit: "Une erreur est survenue lors de l'envoi. Veuillez réessayer."
+    errorSubmit: "Une erreur est survenue lors de l'envoi. Veuillez réessayer.",
+    visitSite: "Visiter le site"
   },
   menu: {
     expertises: "Nos expertises",

@@ -10,7 +10,8 @@ export const mg = {
     successMerci: "Misaotra betsaka!",
     successDemande: "Voaray ny fangatahana!",
     loaderWait: "Kely sisa",
-    errorSubmit: "Nisy fahadisoana nitranga tamin'ny fandefasana. Manandrama indray azafady."
+    errorSubmit: "Nisy fahadisoana nitranga tamin'ny fandefasana. Manandrama indray azafady.",
+    visitSite: "Hizaha ny tranonkala"
   },
   menu: {
     expertises: "Fahaiza-manaonay",

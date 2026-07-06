@@ -19,6 +19,7 @@
     </header>
 
     <aside 
+      v-if="projet.category !== 'web' && listeMediasComplete.length > 1"
       class="track-navigation-latérale"
       ref="trackRef"
       @mousedown="startDrag"
@@ -108,10 +109,20 @@
           <p class="projet-description">
             {{ projet.description }}
           </p>
+          
+          <a 
+            v-if="projet.category === 'web' && (projet.siteUrl || projet.site_url)" 
+            :href="projet.siteUrl || projet.site_url" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            class="lien-visiter-site"
+          >
+            {{ t('common.visitSite') }}
+          </a>
         </div>
       </section>
 
-      <section class="galerie-section">
+      <section v-if="projet.category !== 'web'" class="galerie-section">
         <div class="galerie-conteneur">
           <div 
             v-for="(media, index) in listeMediasComplete.slice(1)" 
@@ -780,6 +791,39 @@ onBeforeUnmount(() => {
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+.lien-visiter-site {
+  margin-top: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  padding-bottom: 4px;
+  transition: border-color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0.95;
+  cursor: pointer;
+}
+
+.lien-visiter-site:hover {
+  border-bottom-color: #ffffff;
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.fleche-lien-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.lien-visiter-site:hover .fleche-lien-icon {
+  transform: translate(2px, -2px);
+}
+
 /* ─── GALERIE D'IMAGES OPTIMISÉE (SANS SAUTS NI CLIGNOTEMENTS) ───────────────── */
 .galerie-section {
   width: 100%;
@@ -963,6 +1007,11 @@ onBeforeUnmount(() => {
   
   .projet-description {
     font-size: 0.95rem;
+  }
+
+  .lien-visiter-site {
+    font-size: 1rem;
+    margin-top: 1.5rem;
   }
   
   .galerie-item-wrapper {

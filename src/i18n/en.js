@@ -10,7 +10,8 @@ export const en = {
     successMerci: "Thank you!",
     successDemande: "Request received!",
     loaderWait: "Please wait during this one-time load",
-    errorSubmit: "An error occurred while sending. Please try again."
+    errorSubmit: "An error occurred while sending. Please try again.",
+    visitSite: "Visit website"
   },
   menu: {
     expertises: "Our expertise",
