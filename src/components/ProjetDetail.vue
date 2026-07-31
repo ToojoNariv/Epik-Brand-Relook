@@ -19,7 +19,7 @@
     </header>
 
     <aside 
-      v-if="projet.category !== 'web' && listeMediasComplete.length > 1"
+      v-if="listeMediasComplete.length > 1"
       class="track-navigation-latérale"
       ref="trackRef"
       @mousedown="startDrag"
@@ -122,7 +122,7 @@
         </div>
       </section>
 
-      <section v-if="projet.category !== 'web'" class="galerie-section">
+      <section class="galerie-section">
         <div class="galerie-conteneur">
           <div 
             v-for="(media, index) in listeMediasComplete.slice(1)" 
