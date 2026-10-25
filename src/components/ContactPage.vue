@@ -14,7 +14,8 @@
       <div class="contact-gauche">
         <div class="titres-wrap">
           <h1 class="contact-titre animate-item">{{ t('contact.title') }}</h1>
-          <a href="hello@epik-brand.com" class="contact-email animate-item">hello@epik-brand.com</a>
+          <a href="mailto:hello@epik-brand.com" class="contact-email animate-item">hello@epik-brand.com</a>
+          <a href="tel:+12135096995" class="contact-tel animate-item">+1 213 509 6995</a>
         </div>
       </div>
 
@@ -436,14 +437,22 @@ onBeforeUnmount(() => {
     letter-spacing: -0.01em;
 }
 
-.contact-email {
-display: inline-block;
-    font-size: clamp(1.4rem, 1vw, 2.8rem);
-    font-weight: 300;
-    color: rgb(255 255 255);
-    text-decoration: none;
-    transition: color 0.3s ease, transform 0.3s ease;
-    transform-origin: left center;
+.titres-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.contact-email,
+.contact-tel {
+  display: inline-block;
+  font-size: clamp(1.4rem, 1vw, 2.8rem);
+  font-weight: 300;
+  color: rgb(255 255 255);
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+  transform-origin: left center;
 }
 
 .contact-email:hover {
@@ -719,7 +728,12 @@ display: inline-block;
     text-align: center;
   }
 
-  .contact-email {
+  .titres-wrap {
+    align-items: center;
+  }
+
+  .contact-email,
+  .contact-tel {
     transform-origin: center center;
   }
 
